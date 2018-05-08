@@ -30,7 +30,10 @@ class Session implements ISession {
   public function close() { }
 
   /** @return void */
-  public function destroy() { $this->eol= time() - 1; }
+  public function destroy() {
+    $this->eol= time() - 1;
+    $this->values= [];
+  }
 
   /**
    * Registers a value - writing it to the session

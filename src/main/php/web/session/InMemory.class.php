@@ -2,6 +2,11 @@
 
 use web\session\memory\Session;
 
+/**
+ * In-Memory session factory
+ *
+ * @test  xp://web.session.unittest.InMemoryTest
+ */
 class InMemory extends Sessions {
   private $sessions;
 
