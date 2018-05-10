@@ -12,9 +12,11 @@ Example
 -------
 
 ```php
-use web\session\ForTesting;
+use web\session\{InFileSystem, ForTesting};
 
-$sessions= new ForTesting();
+// Instantiate session factory
+$sessions= new InFileSystem('/tmp');
+$sessions= (new ForTesting())->lasting(3600);
 
 // Create a new session
 $session= $sessions->create();
