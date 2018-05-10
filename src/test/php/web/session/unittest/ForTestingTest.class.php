@@ -8,4 +8,16 @@ class ForTestingTest extends SessionsTest {
   /** @return web.session.Sessions */
   protected function fixture() { return new ForTesting(); }
 
+  #[@test]
+  public function all_initially_empty() {
+    $sessions= $this->fixture();
+    $this->assertEquals([], $sessions->all());
+  }
+
+  #[@test]
+  public function all_after_creating_session() {
+    $sessions= $this->fixture();
+    $created= $sessions->create();
+    $this->assertEquals([$created->id() => $created], $sessions->all());
+  }
 }
