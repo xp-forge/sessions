@@ -9,7 +9,7 @@ use web\session\SessionInvalid;
  * @see   xp://web.session.ForTesting
  */
 class Session implements ISession {
-  private $new, $id, $eol;
+  private $sessions, $new, $id, $eol;
   private $values= [];
 
   /**

@@ -10,7 +10,7 @@ use io\File;
  * @see   xp://web.session.InFileSystem
  */
 class Session implements ISession {
-  private $new, $file, $eol;
+  private $sessions, $new, $file, $eol;
   private $values= null;
   private $modifications= [];
 
