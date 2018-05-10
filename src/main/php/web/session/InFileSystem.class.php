@@ -40,6 +40,19 @@ class InFileSystem extends Sessions {
     $this->random= new Random();
   }
 
+  /** @return int */
+  public function gc() {
+    $expiry= time() - $this->duration;
+    $deleted= 0;
+    foreach (glob($this->path->getURI().$this->prefix.'*') as $file) {
+      if (filectime($file) >= $expiry) continue;
+
+      unlink($file);
+      $deleted++;
+    }
+    return $deleted;
+  }
+
   /**
    * Creates a session
    *
@@ -52,6 +65,7 @@ class InFileSystem extends Sessions {
     do {
       $f= new File($this->path, $this->prefix.substr($buffer, $offset, 32));
       if (!$f->exists() && $f->touch()) {
+        $this->gc();
         return new Session($f, time() + $this->duration);
       }
     } while ($offset++ < 32);
