@@ -81,7 +81,7 @@ class Session implements ISession {
   /** @return void */
   public function destroy() {
     $this->eol= time() - 1;
-    $this->modifications= [];
+    $this->new= false;
     $this->file->unlink();
   }
 

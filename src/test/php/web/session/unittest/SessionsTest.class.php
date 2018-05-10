@@ -70,6 +70,17 @@ abstract class SessionsTest extends TestCase {
   }
 
   #[@test]
+  public function locate_invalid() {
+    $sessions= $this->fixture();
+
+    $session= $sessions->create();
+    $session->destroy();
+    $session->transmit($this->response());
+
+    $this->assertNull($sessions->locate($this->request($sessions->name().'='.$session->id())));
+  }
+
+  #[@test]
   public function locate_non_existant() {
     $sessions= $this->fixture();
     $this->assertNull($sessions->locate($this->request($sessions->name().'=@non-existant@')));
