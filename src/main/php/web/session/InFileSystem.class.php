@@ -4,6 +4,8 @@ use web\session\filesystem\Session;
 use io\Folder;
 use io\File;
 use lang\Environment;
+use util\Random;
+use lang\IllegalStateException;
 
 /**
  * Session factory that creates sessions in the local filesystem
@@ -11,7 +13,7 @@ use lang\Environment;
  * @test  xp://web.session.unittest.InFileSystemTest
  */
 class InFileSystem extends Sessions {
-  private $path;
+  private $path, $random;
 
   /** @param io.Folder|io.Path|string $path */
   public function __construct($path= null) {
@@ -22,6 +24,7 @@ class InFileSystem extends Sessions {
     } else {
       $this->path= new Folder($path);
     }
+    $this->random= new Random();
   }
 
   /**
@@ -30,7 +33,18 @@ class InFileSystem extends Sessions {
    * @return web.session.Session
    */
   public function create() {
-    return new Session(new File(tempnam($this->path->getURI(), 'session')), time() + $this->duration);
+    $buffer= bin2hex($this->random->bytes(32));   // 64 bytes
+    $offset= 0;
+
+    do {
+      $uri= $this->path->getURI().'sess_'.substr($buffer, $offset, 32);
+      if (!file_exists($uri)) {
+        touch($uri);
+        return new Session(new File($uri), time() + $this->duration);
+      }
+    } while ($offset++ < 32);
+
+    throw new IllegalStateException('Cannot create session. Out of randoms?');
   }
 
   /**
