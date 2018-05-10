@@ -1,11 +1,12 @@
 <?php namespace web\session\unittest;
 
 use unittest\TestCase;
-use web\Request;
-use web\Response;
 use web\io\TestInput;
 use web\io\TestOutput;
+use web\Request;
+use web\Response;
 use web\session\ISession;
+use web\session\NoSuchSession;
 use web\session\SessionInvalid;
 
 abstract class SessionsTest extends TestCase {
@@ -36,6 +37,36 @@ abstract class SessionsTest extends TestCase {
   public function create() {
     $sessions= $this->fixture();
     $this->assertInstanceOf(ISession::class, $sessions->create());
+  }
+
+  #[@test]
+  public function open() {
+    $sessions= $this->fixture();
+    $session= $sessions->create();
+    $session->transmit($this->response());
+
+    $session= $sessions->open($this->request('session='.$session->id()));
+    $this->assertInstanceOf(ISession::class, $session);
+  }
+
+  #[@test, @expect(NoSuchSession::class)]
+  public function open_non_existant() {
+    $this->fixture()->open($this->request('session=@non-existant@'));
+  }
+
+  #[@test]
+  public function locate() {
+    $sessions= $this->fixture();
+    $session= $sessions->create();
+    $session->transmit($this->response());
+
+    $session= $sessions->locate($this->request('session='.$session->id()));
+    $this->assertInstanceOf(ISession::class, $session);
+  }
+
+  #[@test]
+  public function locate_non_existant() {
+    $this->assertNull($this->fixture()->locate($this->request('session=@non-existant@')));
   }
 
   #[@test]

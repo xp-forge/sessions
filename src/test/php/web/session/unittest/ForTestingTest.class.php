@@ -10,8 +10,7 @@ class ForTestingTest extends SessionsTest {
 
   #[@test]
   public function all_initially_empty() {
-    $sessions= $this->fixture();
-    $this->assertEquals([], $sessions->all());
+    $this->assertEquals([], $this->fixture()->all());
   }
 
   #[@test]
