@@ -45,13 +45,14 @@ abstract class SessionsTest extends TestCase {
     $session= $sessions->create();
     $session->transmit($this->response());
 
-    $session= $sessions->open($this->request('session='.$session->id()));
+    $session= $sessions->open($this->request($sessions->name().'='.$session->id()));
     $this->assertInstanceOf(ISession::class, $session);
   }
 
   #[@test, @expect(NoSuchSession::class)]
   public function open_non_existant() {
-    $this->fixture()->open($this->request('session=@non-existant@'));
+    $sessions= $this->fixture();
+    $sessions->open($this->request($sessions->name().'=@non-existant@'));
   }
 
   #[@test]
@@ -60,13 +61,14 @@ abstract class SessionsTest extends TestCase {
     $session= $sessions->create();
     $session->transmit($this->response());
 
-    $session= $sessions->locate($this->request('session='.$session->id()));
+    $session= $sessions->locate($this->request($sessions->name().'='.$session->id()));
     $this->assertInstanceOf(ISession::class, $session);
   }
 
   #[@test]
   public function locate_non_existant() {
-    $this->assertNull($this->fixture()->locate($this->request('session=@non-existant@')));
+    $sessions= $this->fixture();
+    $this->assertNull($sessions->locate($this->request($sessions->name().'=@non-existant@')));
   }
 
   #[@test]
@@ -103,6 +105,13 @@ abstract class SessionsTest extends TestCase {
   }
 
   #[@test]
+  public function remove_non_existant() {
+    $session= $this->fixture()->create();
+    $session->remove('name');
+    $this->assertNull($session->value('name'));
+  }
+
+  #[@test]
   public function read_write_with_two_session_instances() {
     $sessions= $this->fixture();
 
@@ -110,7 +119,7 @@ abstract class SessionsTest extends TestCase {
     $session->register('name', 'value');
     $session->transmit($this->response());
 
-    $session= $sessions->open($this->request('session='.$session->id()));
+    $session= $sessions->open($this->request($sessions->name().'='.$session->id()));
     $value= $session->value('name');
 
     $this->assertEquals('value', $value);

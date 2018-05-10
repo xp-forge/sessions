@@ -42,6 +42,13 @@ abstract class Sessions {
   public function duration() { return $this->duration; }
 
   /**
+   * Returns session cookie name
+   *
+   * @return string
+   */
+  public function name() { return $this->cookie; }
+
+  /**
    * Returns session ID from request 
    *
    * @param  web.Request $request
