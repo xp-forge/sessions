@@ -14,23 +14,27 @@ class ForTesting extends Sessions {
   /**
    * Creates a session
    *
+   * @param  web.Response $response
    * @return web.session.Session
    */
-  public function create() {
+  public function create($response) {
     $id= uniqid(microtime(true));
+    $this->transmit($response, $id);
     return $this->sessions[$id]= new Session($id, time() + $this->duration);
   }
 
   /**
    * Locates an existing session; returns NULL if there is no such session.
    *
-   * @param  string $id
+   * @param  web.Request $request
    * @return web.session.Session
    */
-  public function locate($id) {
-    if (isset($this->sessions[$id])) {
-      if ($this->sessions[$id]->valid()) return $this->sessions[$id];
-      unset($this->sessions[$id]);
+  public function locate($request) {
+    if ($id= $this->id($request)) {
+      if (isset($this->sessions[$id])) {
+        if ($this->sessions[$id]->valid()) return $this->sessions[$id];
+        unset($this->sessions[$id]);
+      }
     }
     return null;
   }

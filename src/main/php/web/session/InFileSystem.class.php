@@ -56,16 +56,19 @@ class InFileSystem extends Sessions {
   /**
    * Creates a session
    *
+   * @param  web.Response $response
    * @return web.session.Session
    */
-  public function create() {
+  public function create($response) {
     $buffer= bin2hex($this->random->bytes(32));   // 64 bytes
     $offset= 0;
 
     do {
-      $f= new File($this->path, $this->prefix.substr($buffer, $offset, 32));
+      $id= substr($buffer, $offset, 32);
+      $f= new File($this->path, $this->prefix.$id);
       if (!$f->exists() && $f->touch()) {
         $this->gc();
+        $this->transmit($response, $id);
         return new Session($f, time() + $this->duration);
       }
     } while ($offset++ < 32);
@@ -76,17 +79,19 @@ class InFileSystem extends Sessions {
   /**
    * Locates an existing session; returns NULL if there is no such session.
    *
-   * @param  string $id
+   * @param  web.Request $request
    * @return web.session.Session
    */
-  public function locate($id) {
-    $f= new File($this->path->getURI(), $this->prefix.$id);
-    if ($f->exists()) {
-      $created= $f->createdAt();
-      if (time() - $created < $this->duration) {
-        return new Session($f, $created + $this->duration);
+  public function locate($request) {
+    if ($id= $this->id($request)) {
+      $f= new File($this->path->getURI(), $this->prefix.$id);
+      if ($f->exists()) {
+        $created= $f->createdAt();
+        if (time() - $created < $this->duration) {
+          return new Session($f, $created + $this->duration);
+        }
+        $f->unlink();
       }
-      $f->unlink();
     }
     return null;
   }
