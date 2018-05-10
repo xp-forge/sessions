@@ -36,6 +36,7 @@ interface ISession {
    * @param  string $name
    * @param  var $value
    * @return void
+   * @throws web.session.SessionInvalid
    */
   public function register($name, $value);
 
@@ -45,6 +46,7 @@ interface ISession {
    * @param  string $name
    * @param  var $default
    * @return var
+   * @throws web.session.SessionInvalid
    */
   public function value($name, $default= null);
 
@@ -53,6 +55,7 @@ interface ISession {
    *
    * @param  string $name
    * @return void
+   * @throws web.session.SessionInvalid
    */
   public function remove($name);
 }
