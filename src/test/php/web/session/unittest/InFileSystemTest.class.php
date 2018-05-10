@@ -43,6 +43,13 @@ class InFileSystemTest extends TestCase {
   }
 
   #[@test]
+  public function session_identifiers_consist_of_32_lowercase_hex_digits() {
+    $sessions= new InFileSystem(self::$dir);
+    $id= $sessions->create()->id();
+    $this->assertTrue((bool)preg_match('/^[a-f0-9]{32}$/i', $id), $id);
+  }
+
+  #[@test]
   public function read_write() {
     $session= (new InFileSystem(self::$dir))->create();
     try {
