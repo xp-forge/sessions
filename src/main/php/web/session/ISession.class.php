@@ -17,13 +17,6 @@ interface ISession {
   public function valid();
 
   /**
-   * Closes the session
-   *
-   * @return void
-   */
-  public function close();
-
-  /**
    * Destroys the session
    *
    * @return void
@@ -58,4 +51,12 @@ interface ISession {
    * @throws web.session.SessionInvalid
    */
   public function remove($name);
+
+  /**
+   * Transmits this session to the response
+   *
+   * @param  web.Response $response
+   * @return void
+   */
+  public function transmit($response);
 }

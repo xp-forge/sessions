@@ -10,6 +10,7 @@ use web\Cookie;
  */
 abstract class Sessions {
   protected $duration= 86400;
+  protected $cookie= 'session';
 
   /**
    * Sets how long a session should last. Defaults to one day.
@@ -23,27 +24,6 @@ abstract class Sessions {
   }
 
   /**
-   * Returns session ID from request 
-   *
-   * @param  web.Request $request
-   * @return string
-   */
-  public function id($request) {
-    return $request->cookie('session');
-  }
-
-  /**
-   * Sends session ID
-   *
-   * @param  web.Reponse
-   * @param  string $id
-   * @return void
-   */
-  public function transmit($response, $id) {
-    $response->cookie((new Cookie('session', $id))->maxAge($this->duration));
-  }
-
-  /**
    * Returns session duration in seconds
    *
    * @return int
@@ -51,12 +31,41 @@ abstract class Sessions {
   public function duration() { return $this->duration; }
 
   /**
+   * Returns session ID from request 
+   *
+   * @param  web.Request $request
+   * @return string
+   */
+  public function id($request) { return $request->cookie($this->cookie); }
+
+  /**
+   * Attaches session ID to response 
+   *
+   * @param  string $id
+   * @param  web.Response $response
+   * @return vod
+   */
+  public function attach($id, $response) {
+    $response->cookie((new Cookie($this->cookie, $id))->maxAge($this->duration));
+  }
+
+  /**
+   * Detaches session ID from response 
+   *
+   * @param  string $id
+   * @param  web.Response $response
+   * @return vod
+   */
+  public function detach($id, $response) {
+    $response->cookie(new Cookie($this->cookie, null));
+  }
+
+  /**
    * Creates a session
    *
-   * @param  web.Response $response
    * @return web.session.Session
    */
-  public abstract function create($response);
+  public abstract function create();
 
   /**
    * Locates an existing and valid session; returns NULL if there is no such session.

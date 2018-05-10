@@ -19,7 +19,7 @@ $sessions= new InFileSystem('/tmp');
 $sessions= (new ForTesting())->lasting(3600);
 
 // Create a new session
-$session= $sessions->create($response);
+$session= $sessions->create();
 
 // Open an existing session
 $session= $sessions->open($request);
@@ -35,7 +35,6 @@ $session->remove('key');
 // Destroy
 $session->destroy();
 
-// Finally, close session. Ensure you always call this - it will take care
-// of synchronizing session values with the underlying storage.
-$session->close();
+// Finally, transmit session to response. Ensure you always call this!
+$session->transmit($response);
 ```

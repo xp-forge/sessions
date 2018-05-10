@@ -56,10 +56,9 @@ class InFileSystem extends Sessions {
   /**
    * Creates a session
    *
-   * @param  web.Response $response
    * @return web.session.Session
    */
-  public function create($response) {
+  public function create() {
     $buffer= bin2hex($this->random->bytes(32));   // 64 bytes
     $offset= 0;
 
@@ -68,8 +67,7 @@ class InFileSystem extends Sessions {
       $f= new File($this->path, $this->prefix.$id);
       if (!$f->exists() && $f->touch()) {
         $this->gc();
-        $this->transmit($response, $id);
-        return new Session($f, time() + $this->duration);
+        return new Session($this, $f, true, time() + $this->duration);
       }
     } while ($offset++ < 32);
 
@@ -88,7 +86,7 @@ class InFileSystem extends Sessions {
       if ($f->exists()) {
         $created= $f->createdAt();
         if (time() - $created < $this->duration) {
-          return new Session($f, $created + $this->duration);
+          return new Session($this, $f, false, $created + $this->duration);
         }
         $f->unlink();
       }

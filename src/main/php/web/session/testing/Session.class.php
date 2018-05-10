@@ -1,6 +1,7 @@
 <?php namespace web\session\testing;
 
 use web\session\ISession;
+use web\session\SessionInvalid;
 
 /**
  * A testing session
@@ -8,17 +9,21 @@ use web\session\ISession;
  * @see   xp://web.session.ForTesting
  */
 class Session implements ISession {
-  private $id, $eol;
+  private $new, $id, $eol;
   private $values= [];
 
   /**
    * Creates a new in-memory session
    *
+   * @param  web.session.Sessions $sessions
    * @param  string $id
+   * @param  bool $new
    * @param  int $eol
    */
-  public function __construct($id, $eol) {
+  public function __construct($sessions, $id, $new, $eol) {
+    $this->sessions= $sessions;
     $this->id= $id;
+    $this->new= $new;
     $this->eol= $eol;
   }
 
@@ -27,9 +32,6 @@ class Session implements ISession {
 
   /** @return bool */
   public function valid() { return time() < $this->eol; }
-
-  /** @return void */
-  public function close() { }
 
   /** @return void */
   public function destroy() {
@@ -79,5 +81,20 @@ class Session implements ISession {
       throw new SessionInvalid($this->id);
     }
     unset($this->values[$name]);
+  }
+
+  /**
+   * Transmits this session to the response
+   *
+   * @param  web.Response $response
+   * @return void
+   */
+  public function transmit($response) {
+    if ($this->new) {
+      $this->sessions->attach($this->id(), $response);
+      $this->new= false;
+    } else if (time() < $this->eol) {
+      $this->sessions->detach($this->id(), $response);
+    }
   }
 }
