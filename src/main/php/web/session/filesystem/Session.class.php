@@ -25,7 +25,7 @@ class Session implements ISession {
   }
 
   /** @return string */
-  public function id() { return $this->file->getFileName(); }
+  public function id() { return str_replace('sess_', '', $this->file->getFileName()); }
 
   /** @return bool */
   public function valid() { return time() < $this->eol; }
@@ -44,7 +44,7 @@ class Session implements ISession {
    */
   private function open() {
     if (time() >= $this->eol) {
-      throw new SessionInvalid($this->file->getFileName());
+      throw new SessionInvalid($this->id());
     } else if (null !== $this->values) {
       return;
     }
