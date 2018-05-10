@@ -68,8 +68,11 @@ class InFileSystem extends Sessions {
   public function locate($id) {
     $f= new File($this->path->getURI(), $this->prefix.$id);
     if ($f->exists()) {
-      $age= time() - $f->createdAt();
-      return new Session($f, time() + ($this->duration - $age));
+      $created= $f->createdAt();
+      if (time() - $created < $this->duration) {
+        return new Session($f, $created + $this->duration);
+      }
+      $f->unlink();
     }
     return null;
   }
