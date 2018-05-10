@@ -9,7 +9,7 @@ use web\session\testing\Session;
  * @test  xp://web.session.unittest.ForTestingTest
  */
 class ForTesting extends Sessions {
-  private $sessions;
+  private $sessions= [];
 
   /**
    * Creates a session
@@ -28,11 +28,10 @@ class ForTesting extends Sessions {
    * @return web.session.Session
    */
   public function locate($request) {
-    if ($id= $this->id($request)) {
-      if (isset($this->sessions[$id])) {
-        if ($this->sessions[$id]->valid()) return $this->sessions[$id];
-        unset($this->sessions[$id]);
-      }
+    $id= $id= $this->id($request);
+    if (isset($this->sessions[$id])) {
+      if ($this->sessions[$id]->valid()) return $this->sessions[$id];
+      unset($this->sessions[$id]);
     }
     return null;
   }

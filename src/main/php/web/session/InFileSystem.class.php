@@ -63,8 +63,7 @@ class InFileSystem extends Sessions {
     $offset= 0;
 
     do {
-      $id= substr($buffer, $offset, 32);
-      $f= new File($this->path, $this->prefix.$id);
+      $f= new File($this->path, $this->prefix.substr($buffer, $offset, 32));
       if (!$f->exists()) {
         $this->gc();
         return new Session($this, $f, true, time() + $this->duration);
