@@ -106,4 +106,16 @@ class InFileSystemTest extends TestCase {
 
     $this->assertEquals('value', $value);
   }
+
+  #[@test]
+  public function destroy() {
+    $session= (new InFileSystem(self::$dir))->create();
+    try {
+      $session->register('name', 'value');
+      $session->destroy();
+      $this->assertFalse($session->valid());
+    } finally {
+      $session->close();
+    }
+  }
 }
