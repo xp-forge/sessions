@@ -22,10 +22,10 @@ $sessions= (new ForTesting())->lasting(3600);
 $session= $sessions->create();
 
 // Open an existing session
-$session= $sessions->open($id);
+$session= $sessions->open($request);
 
 // ...or, if you'd like to do this conditionally
-if ($session= $sessions->locate($id)) { … }
+if ($session= $sessions->locate($request)) { … }
 
 // Basic I/O operations
 $session->register('key', 'value');
@@ -35,7 +35,6 @@ $session->remove('key');
 // Destroy
 $session->destroy();
 
-// Finally, close session. Ensure you always call this - it will take care
-// of synchronizing session values with the underlying storage.
-$session->close();
+// Finally, transmit session to response. Ensure you always call this!
+$session->transmit($response);
 ```

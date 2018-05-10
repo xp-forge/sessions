@@ -1,6 +1,7 @@
 <?php namespace web\session\filesystem;
 
 use web\session\ISession;
+use web\session\SessionInvalid;
 use io\File;
 
 /**
@@ -9,19 +10,28 @@ use io\File;
  * @see   xp://web.session.InFileSystem
  */
 class Session implements ISession {
-  private $file, $eol;
+  private $sessions, $new, $file, $eol;
   private $values= null;
   private $modifications= [];
 
   /**
    * Creates a new file-based session
    *
+   * @param  web.session.Sessions $sessions
    * @param  string|io.File $file
+   * @param  bool $new
    * @param  int eol
    */
-  public function __construct($file, $eol) {
+  public function __construct($sessions, $file, $new, $eol) {
+    $this->sessions= $sessions;
     $this->file= $file instanceof File ? $file : new File($file);
+    $this->new= $new;
     $this->eol= $eol;
+
+    if ($new) {
+      $file->touch();
+      $this->values= [];
+    }
   }
 
   /** @return string */
@@ -49,15 +59,11 @@ class Session implements ISession {
       return;
     }
 
-    if (0 === $size= $this->size()) {
-      $this->values= [];
-    } else {
-      $this->file->open(File::READ);
-      $this->file->lockShared();
-      $this->values= unserialize($this->file->read($size));
-      $this->file->unLock();
-      $this->file->close();
-    }
+    $this->file->open(File::READ);
+    $this->file->lockShared();
+    $this->values= unserialize($this->file->read($this->size()));
+    $this->file->unLock();
+    $this->file->close();
   }
 
   /**
@@ -73,35 +79,9 @@ class Session implements ISession {
   }
 
   /** @return void */
-  public function close() {
-    if (empty($this->modifications)) return;
-
-    $this->file->open(File::READWRITE);
-    $this->file->lockExclusive();
-
-    // Read file to ensure we have the most current version of the data
-    if (0 === $size= $this->size()) {
-      $this->values= [];
-    } else {
-      $this->values= unserialize($this->file->read($size));
-      $this->file->seek(0, SEEK_SET);
-    }
-
-    // Replay all modifications, then write back
-    foreach ($this->modifications as $name => $modification) {
-      $modification($name);
-    }
-    $this->modifications= [];
-    $this->file->write(serialize($this->values));
-
-    $this->file->unLock();
-    $this->file->close();
-  }
-
-  /** @return void */
   public function destroy() {
     $this->eol= time() - 1;
-    $this->modifications= [];
+    $this->new= false;
     $this->file->unlink();
   }
 
@@ -141,5 +121,44 @@ class Session implements ISession {
   public function remove($name) {
     $this->open();
     $this->modify($name, function() use($name) { unset($this->values[$name]); });
+  }
+
+  /**
+   * Transmits this session to the response
+   *
+   * @param  web.Response $response
+   * @return void
+   */
+  public function transmit($response) {
+    if ($this->new) {
+      $this->sessions->attach($this->id(), $response);
+      // Fall through, writing session data
+    } else if (time() >= $this->eol) {
+      $this->sessions->detach($this->id(), $response);
+      return;
+    } else if (empty($this->modifications)) {
+      return;
+    }
+
+    $this->file->open(File::READWRITE);
+    $this->file->lockExclusive();
+
+    // Read file to ensure we have the most current version of the data
+    if (0 === $size= $this->size()) {
+      $this->values= [];
+    } else {
+      $this->values= unserialize($this->file->read($size));
+      $this->file->seek(0, SEEK_SET);
+    }
+
+    // Replay all modifications, then write back
+    foreach ($this->modifications as $name => $modification) {
+      $modification($name);
+    }
+    $this->modifications= [];
+    $this->file->write(serialize($this->values));
+
+    $this->file->unLock();
+    $this->file->close();
   }
 }

@@ -1,6 +1,7 @@
 <?php namespace web\session;
 
 use util\TimeSpan;
+use web\Cookie;
 
 /**
  * Base class for session factories
@@ -9,6 +10,7 @@ use util\TimeSpan;
  */
 abstract class Sessions {
   protected $duration= 86400;
+  protected $cookie= 'session';
 
   /**
    * Sets how long a session should last. Defaults to one day.
@@ -22,11 +24,59 @@ abstract class Sessions {
   }
 
   /**
+   * Sets the cookie name
+   *
+   * @param  string $cookie
+   * @return self
+   */
+  public function named($cookie) {
+    $this->cookie= $cookie;
+    return $this;
+  }
+
+  /**
    * Returns session duration in seconds
    *
    * @return int
    */
   public function duration() { return $this->duration; }
+
+  /**
+   * Returns session cookie name
+   *
+   * @return string
+   */
+  public function name() { return $this->cookie; }
+
+  /**
+   * Returns session ID from request 
+   *
+   * @param  web.Request $request
+   * @return string
+   */
+  public function id($request) { return $request->cookie($this->cookie); }
+
+  /**
+   * Attaches session ID to response 
+   *
+   * @param  string $id
+   * @param  web.Response $response
+   * @return vod
+   */
+  public function attach($id, $response) {
+    $response->cookie((new Cookie($this->cookie, $id))->maxAge($this->duration));
+  }
+
+  /**
+   * Detaches session ID from response 
+   *
+   * @param  string $id
+   * @param  web.Response $response
+   * @return vod
+   */
+  public function detach($id, $response) {
+    $response->cookie(new Cookie($this->cookie, null));
+  }
 
   /**
    * Creates a session
@@ -38,21 +88,21 @@ abstract class Sessions {
   /**
    * Locates an existing and valid session; returns NULL if there is no such session.
    *
-   * @param  string $id
+   * @param  web.Request $request
    * @return web.session.ISession
    */
-  public abstract function locate($id);
+  public abstract function locate($request);
 
   /**
    * Opens an existing and valid session. Like `locate()` but raises an exception of
    * there is no such sessions.
    *
-   * @param  string $id The session ID
+   * @param  web.Request $request
    * @return web.session.ISession
    * @throws web.session.NoSuchSession
    */
-  public function open($id) {
-    if ($session= $this->locate($id)) return $session;
-    throw new NoSuchSession($id);
+  public function open($request) {
+    if ($session= $this->locate($request)) return $session;
+    throw new NoSuchSession($this->id($request));
   }
 }

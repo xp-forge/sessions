@@ -9,7 +9,7 @@ use web\session\testing\Session;
  * @test  xp://web.session.unittest.ForTestingTest
  */
 class ForTesting extends Sessions {
-  private $sessions;
+  private $sessions= [];
 
   /**
    * Creates a session
@@ -18,16 +18,17 @@ class ForTesting extends Sessions {
    */
   public function create() {
     $id= uniqid(microtime(true));
-    return $this->sessions[$id]= new Session($id, time() + $this->duration);
+    return $this->sessions[$id]= new Session($this, $id, true, time() + $this->duration);
   }
 
   /**
    * Locates an existing session; returns NULL if there is no such session.
    *
-   * @param  string $id
+   * @param  web.Request $request
    * @return web.session.Session
    */
-  public function locate($id) {
+  public function locate($request) {
+    $id= $this->id($request);
     if (isset($this->sessions[$id])) {
       if ($this->sessions[$id]->valid()) return $this->sessions[$id];
       unset($this->sessions[$id]);
