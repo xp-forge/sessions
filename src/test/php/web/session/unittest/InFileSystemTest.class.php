@@ -5,6 +5,7 @@ use web\session\InFileSystem;
 use web\session\ISession;
 use lang\Environment;
 use io\Folder;
+use lang\IllegalArgumentException;
 
 class InFileSystemTest extends TestCase {
   private static $dir;
@@ -28,6 +29,11 @@ class InFileSystemTest extends TestCase {
   #[@test]
   public function can_create_with_dir() {
     new InFileSystem(self::$dir);
+  }
+
+  #[@test, @expect(IllegalArgumentException::class)]
+  public function raises_error_when_non_existant_directory_is_given() {
+    new InFileSystem('@does-not-exist@');
   }
 
   #[@test]

@@ -1,11 +1,12 @@
 <?php namespace web\session;
 
-use web\session\filesystem\Session;
-use io\Folder;
 use io\File;
+use io\Folder;
 use lang\Environment;
-use util\Random;
+use lang\IllegalArgumentException;
 use lang\IllegalStateException;
+use util\Random;
+use web\session\filesystem\Session;
 
 /**
  * Session factory that creates sessions in the local filesystem
@@ -15,7 +16,12 @@ use lang\IllegalStateException;
 class InFileSystem extends Sessions {
   private $path, $random;
 
-  /** @param io.Folder|io.Path|string $path */
+  /**
+   * Creates a new filesystem-based factory
+   *
+   * @param io.Folder|io.Path|string $path
+   * @throws lang.IllegalArgumentException if the path does not exist or is not writable
+   */
   public function __construct($path= null) {
     if (null === $path) {
       $this->path= new Folder(Environment::tempDir());
@@ -24,6 +30,11 @@ class InFileSystem extends Sessions {
     } else {
       $this->path= new Folder($path);
     }
+
+    if (!is_writable($this->path->getURI())) {
+      throw new IllegalArgumentException('Path '.$this->path->getURI().' is not writable');
+    }
+
     $this->random= new Random();
   }
 
@@ -37,10 +48,9 @@ class InFileSystem extends Sessions {
     $offset= 0;
 
     do {
-      $uri= $this->path->getURI().'sess_'.substr($buffer, $offset, 32);
-      if (!file_exists($uri)) {
-        touch($uri);
-        return new Session(new File($uri), time() + $this->duration);
+      $f= new File($this->path, 'sess_'.substr($buffer, $offset, 32));
+      if (!$f->exists() && $f->touch()) {
+        return new Session($f, time() + $this->duration);
       }
     } while ($offset++ < 32);
 
@@ -54,7 +64,7 @@ class InFileSystem extends Sessions {
    * @return web.session.Session
    */
   public function locate($id) {
-    $f= new File($this->path->getURI(), $id);
+    $f= new File($this->path->getURI(), 'sess_'.$id);
     if ($f->exists()) {
       $age= time() - $f->createdAt();
       return new Session($f, time() + ($this->duration - $age));
