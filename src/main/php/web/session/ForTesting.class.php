@@ -1,13 +1,14 @@
 <?php namespace web\session;
 
-use web\session\memory\Session;
+use web\session\testing\Session;
 
 /**
- * In-Memory session factory
+ * Session factory used for testing. Keeps session data in a backing map
+ * in memory.
  *
- * @test  xp://web.session.unittest.InMemoryTest
+ * @test  xp://web.session.unittest.ForTestingTest
  */
-class InMemory extends Sessions {
+class ForTesting extends Sessions {
   private $sessions;
 
   /**
@@ -21,25 +22,17 @@ class InMemory extends Sessions {
   }
 
   /**
-   * Opens an existing session
-   *
-   * @param  string $id
-   * @return web.session.Session
-   * @throws web.session.NoSuchSession
-   */
-  public function open($id) {
-    if (isset($this->sessions[$id])) return $this->sessions[$id];
-    throw new NoSuchSession($id);
-  }
-
-  /**
    * Locates an existing session; returns NULL if there is no such session.
    *
    * @param  string $id
    * @return web.session.Session
    */
   public function locate($id) {
-    return isset($this->sessions[$id]) ? $this->sessions[$id] : null;
+    if (isset($this->sessions[$id])) {
+      if ($this->sessions[$id]->valid()) return $this->sessions[$id];
+      unset($this->sessions[$id]);
+    }
+    return null;
   }
 
   /**

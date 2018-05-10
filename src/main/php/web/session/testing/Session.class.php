@@ -1,9 +1,11 @@
-<?php namespace web\session\memory;
+<?php namespace web\session\testing;
 
 use web\session\ISession;
 
 /**
- * An in-memory session
+ * A testing session
+ *
+ * @see   xp://web.session.ForTesting
  */
 class Session implements ISession {
   private $id, $eol;
@@ -41,8 +43,12 @@ class Session implements ISession {
    * @param  string $name
    * @param  var $value
    * @return void
+   * @throws web.session.SessionInvalid
    */
   public function register($name, $value) {
+    if (time() >= $this->eol) {
+      throw new SessionInvalid($this->id);
+    }
     $this->values[$name]= [$value];
   }
 
@@ -52,8 +58,12 @@ class Session implements ISession {
    * @param  string $name
    * @param  var $default
    * @return var
+   * @throws web.session.SessionInvalid
    */
   public function value($name, $default= null) {
+    if (time() >= $this->eol) {
+      throw new SessionInvalid($this->id);
+    }
     return isset($this->values[$name]) ? $this->values[$name][0] : $default;
   }
 
@@ -62,8 +72,12 @@ class Session implements ISession {
    *
    * @param  string $name
    * @return void
+   * @throws web.session.SessionInvalid
    */
   public function remove($name) {
+    if (time() >= $this->eol) {
+      throw new SessionInvalid($this->id);
+    }
     unset($this->values[$name]);
   }
 }

@@ -36,19 +36,23 @@ abstract class Sessions {
   public abstract function create();
 
   /**
-   * Opens an existing session
+   * Locates an existing and valid session; returns NULL if there is no such session.
    *
    * @param  string $id
-   * @return web.session.Session
-   * @throws web.session.NoSuchSession
-   */
-  public abstract function open($id);
-
-  /**
-   * Locates an existing session; returns NULL if there is no such session.
-   *
-   * @param  string $id
-   * @return web.session.Session
+   * @return web.session.ISession
    */
   public abstract function locate($id);
+
+  /**
+   * Opens an existing and valid session. Like `locate()` but raises an exception of
+   * there is no such sessions.
+   *
+   * @param  string $id The session ID
+   * @return web.session.ISession
+   * @throws web.session.NoSuchSession
+   */
+  public function open($id) {
+    if ($session= $this->locate($id)) return $session;
+    throw new NoSuchSession($id);
+  }
 }
