@@ -23,11 +23,9 @@ $session= $sessions->create();
 $session= $sessions->open($id);
 
 // ...or, if you'd like to do this conditionally
-if ($session= $sessions->locate($id)) {
+if ($session= $sessions->locate($id)) { … }
 
-}
-
-// CRUD
+// Basic I/O operations
 $session->register('key', 'value');
 $value= $session->value('key');
 $session->remove('key');
@@ -35,6 +33,7 @@ $session->remove('key');
 // Destroy
 $session->destroy();
 
-// Finally, close session.
+// Finally, close session. Ensure you always call this - it will take care
+// of synchronizing session values with the underlying storage.
 $session->close();
 ```
