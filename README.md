@@ -8,3 +8,33 @@ Sessions for the XP Framework
 [![Supports PHP 7.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-7_0plus.png)](http://php.net/)
 [![Latest Stable Version](https://poser.pugx.org/xp-forge/sessions/version.png)](https://packagist.org/packages/xp-forge/sessions)
 
+Example
+-------
+
+```php
+use web\session\ForTesting;
+
+$sessions= new ForTesting();
+
+// Create a new session
+$session= $sessions->create();
+
+// Open an existing session
+$session= $sessions->open($id);
+
+// ...or, if you'd like to do this conditionally
+if ($session= $sessions->locate($id)) {
+
+}
+
+// CRUD
+$session->register('key', 'value');
+$value= $session->value('key');
+$session->remove('key');
+
+// Destroy
+$session->destroy();
+
+// Finally, close session.
+$session->close();
+```
