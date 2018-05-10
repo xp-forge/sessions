@@ -24,6 +24,17 @@ abstract class Sessions {
   }
 
   /**
+   * Sets the cookie name
+   *
+   * @param  string $cookie
+   * @return self
+   */
+  public function named($cookie) {
+    $this->cookie= $cookie;
+    return $this;
+  }
+
+  /**
    * Returns session duration in seconds
    *
    * @return int

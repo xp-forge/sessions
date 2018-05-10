@@ -18,7 +18,7 @@ class ForTesting extends Sessions {
    */
   public function create() {
     $id= uniqid(microtime(true));
-    return $this->sessions[$id]= new Session($this, true, $id, time() + $this->duration);
+    return $this->sessions[$id]= new Session($this, $id, true, time() + $this->duration);
   }
 
   /**
@@ -28,7 +28,7 @@ class ForTesting extends Sessions {
    * @return web.session.Session
    */
   public function locate($request) {
-    $id= $id= $this->id($request);
+    $id= $this->id($request);
     if (isset($this->sessions[$id])) {
       if ($this->sessions[$id]->valid()) return $this->sessions[$id];
       unset($this->sessions[$id]);
