@@ -42,11 +42,13 @@ abstract class SessionsTest extends TestCase {
   #[@test]
   public function open() {
     $sessions= $this->fixture();
+
     $session= $sessions->create();
+    $session->register('id', 'Test');
     $session->transmit($this->response());
 
     $session= $sessions->open($this->request($sessions->name().'='.$session->id()));
-    $this->assertInstanceOf(ISession::class, $session);
+    $this->assertEquals('Test', $session->value('id'));
   }
 
   #[@test, @expect(NoSuchSession::class)]
@@ -58,11 +60,13 @@ abstract class SessionsTest extends TestCase {
   #[@test]
   public function locate() {
     $sessions= $this->fixture();
+
     $session= $sessions->create();
+    $session->register('id', 'Test');
     $session->transmit($this->response());
 
     $session= $sessions->locate($this->request($sessions->name().'='.$session->id()));
-    $this->assertInstanceOf(ISession::class, $session);
+    $this->assertEquals('Test', $session->value('id'));
   }
 
   #[@test]
