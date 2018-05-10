@@ -19,13 +19,13 @@ $sessions= new InFileSystem('/tmp');
 $sessions= (new ForTesting())->lasting(3600);
 
 // Create a new session
-$session= $sessions->create();
+$session= $sessions->create($response);
 
 // Open an existing session
-$session= $sessions->open($id);
+$session= $sessions->open($request);
 
 // ...or, if you'd like to do this conditionally
-if ($session= $sessions->locate($id)) { … }
+if ($session= $sessions->locate($request)) { … }
 
 // Basic I/O operations
 $session->register('key', 'value');

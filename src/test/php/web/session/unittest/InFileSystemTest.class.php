@@ -1,13 +1,12 @@
 <?php namespace web\session\unittest;
 
-use unittest\TestCase;
+use io\Folder;
+use lang\Environment;
+use lang\IllegalArgumentException;
 use web\session\InFileSystem;
 use web\session\ISession;
-use lang\Environment;
-use io\Folder;
-use lang\IllegalArgumentException;
 
-class InFileSystemTest extends TestCase {
+class InFileSystemTest extends SessionsTest {
   private static $dir;
 
   #[@beforeClass]
@@ -39,19 +38,19 @@ class InFileSystemTest extends TestCase {
   #[@test]
   public function create() {
     $sessions= new InFileSystem(self::$dir);
-    $this->assertInstanceOf(ISession::class, $sessions->create());
+    $this->assertInstanceOf(ISession::class, $sessions->create($this->response()));
   }
 
   #[@test]
   public function session_identifiers_consist_of_32_lowercase_hex_digits() {
     $sessions= new InFileSystem(self::$dir);
-    $id= $sessions->create()->id();
+    $id= $sessions->create($this->response())->id();
     $this->assertTrue((bool)preg_match('/^[a-f0-9]{32}$/i', $id), $id);
   }
 
   #[@test]
   public function read_write() {
-    $session= (new InFileSystem(self::$dir))->create();
+    $session= (new InFileSystem(self::$dir))->create($this->response());
     try {
       $session->register('name', 'value');
       $this->assertEquals('value', $session->value('name'));
@@ -62,7 +61,7 @@ class InFileSystemTest extends TestCase {
 
   #[@test]
   public function read_non_existant() {
-    $session= (new InFileSystem(self::$dir))->create();
+    $session= (new InFileSystem(self::$dir))->create($this->response());
     try {
       $this->assertNull($session->value('name'));
     } finally {
@@ -72,7 +71,7 @@ class InFileSystemTest extends TestCase {
 
   #[@test]
   public function read_non_existant_returns_default() {
-    $session= (new InFileSystem(self::$dir))->create();
+    $session= (new InFileSystem(self::$dir))->create($this->response());
     try {
       $this->assertEquals('Default value', $session->value('name', 'Default value'));
     } finally {
@@ -82,7 +81,7 @@ class InFileSystemTest extends TestCase {
 
   #[@test]
   public function remove() {
-    $session= (new InFileSystem(self::$dir))->create();
+    $session= (new InFileSystem(self::$dir))->create($this->response());
     try {
       $session->register('name', 'value');
       $session->remove('name');
@@ -96,11 +95,11 @@ class InFileSystemTest extends TestCase {
   public function read_write_with_two_session_instances() {
     $sessions= new InFileSystem(self::$dir);
 
-    $session= $sessions->create();
+    $session= $sessions->create($this->response());
     $session->register('name', 'value');
     $session->close();
 
-    $session= $sessions->open($session->id());
+    $session= $sessions->open($this->request('session='.$session->id()));
     $value= $session->value('name');
     $session->close();
 
@@ -109,7 +108,7 @@ class InFileSystemTest extends TestCase {
 
   #[@test]
   public function destroy() {
-    $session= (new InFileSystem(self::$dir))->create();
+    $session= (new InFileSystem(self::$dir))->create($this->response());
     try {
       $session->register('name', 'value');
       $session->destroy();
