@@ -28,8 +28,10 @@ class Session implements ISession {
     $this->new= $new;
     $this->eol= $eol;
 
-    // Prevent open() from accessing filesystem
-    $new && $this->values= [];
+    if ($new) {
+      $file->touch();
+      $this->values= [];
+    }
   }
 
   /** @return string */
@@ -57,15 +59,11 @@ class Session implements ISession {
       return;
     }
 
-    if (0 === $size= $this->size()) {
-      $this->values= [];
-    } else {
-      $this->file->open(File::READ);
-      $this->file->lockShared();
-      $this->values= unserialize($this->file->read($size));
-      $this->file->unLock();
-      $this->file->close();
-    }
+    $this->file->open(File::READ);
+    $this->file->lockShared();
+    $this->values= unserialize($this->file->read($this->size()));
+    $this->file->unLock();
+    $this->file->close();
   }
 
   /**
@@ -134,7 +132,7 @@ class Session implements ISession {
   public function transmit($response) {
     if ($this->new) {
       $this->sessions->attach($this->id(), $response);
-      $this->new= false;
+      // Fall through, writing session data
     } else if (time() >= $this->eol) {
       $this->sessions->detach($this->id(), $response);
       return;

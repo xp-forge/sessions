@@ -65,7 +65,7 @@ class InFileSystem extends Sessions {
     do {
       $id= substr($buffer, $offset, 32);
       $f= new File($this->path, $this->prefix.$id);
-      if (!$f->exists() && $f->touch()) {
+      if (!$f->exists()) {
         $this->gc();
         return new Session($this, $f, true, time() + $this->duration);
       }
