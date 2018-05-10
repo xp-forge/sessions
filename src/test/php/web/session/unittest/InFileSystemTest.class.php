@@ -26,14 +26,19 @@ class InFileSystemTest extends TestCase {
   }
 
   #[@test]
+  public function can_create_with_dir() {
+    new InFileSystem(self::$dir);
+  }
+
+  #[@test]
   public function create() {
-    $sessions= new InFileSystem();
+    $sessions= new InFileSystem(self::$dir);
     $this->assertInstanceOf(ISession::class, $sessions->create());
   }
 
   #[@test]
   public function read_write() {
-    $session= (new InFileSystem())->create();
+    $session= (new InFileSystem(self::$dir))->create();
     try {
       $session->register('name', 'value');
       $this->assertEquals('value', $session->value('name'));
@@ -44,7 +49,7 @@ class InFileSystemTest extends TestCase {
 
   #[@test]
   public function read_non_existant() {
-    $session= (new InFileSystem())->create();
+    $session= (new InFileSystem(self::$dir))->create();
     try {
       $this->assertNull($session->value('name'));
     } finally {
@@ -54,7 +59,7 @@ class InFileSystemTest extends TestCase {
 
   #[@test]
   public function read_non_existant_returns_default() {
-    $session= (new InFileSystem())->create();
+    $session= (new InFileSystem(self::$dir))->create();
     try {
       $this->assertEquals('Default value', $session->value('name', 'Default value'));
     } finally {
@@ -64,7 +69,7 @@ class InFileSystemTest extends TestCase {
 
   #[@test]
   public function remove() {
-    $session= (new InFileSystem())->create();
+    $session= (new InFileSystem(self::$dir))->create();
     try {
       $session->register('name', 'value');
       $session->remove('name');
@@ -76,7 +81,7 @@ class InFileSystemTest extends TestCase {
 
   #[@test]
   public function read_write_with_two_session_instances() {
-    $sessions= new InFileSystem();
+    $sessions= new InFileSystem(self::$dir);
 
     $session= $sessions->create();
     $session->register('name', 'value');
