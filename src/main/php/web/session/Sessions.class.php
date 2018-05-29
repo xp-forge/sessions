@@ -11,6 +11,7 @@ use web\Cookie;
 abstract class Sessions {
   protected $duration= 86400;
   protected $cookie= 'session';
+  protected $path= '/';
 
   /**
    * Sets how long a session should last. Defaults to one day.
@@ -35,6 +36,17 @@ abstract class Sessions {
   }
 
   /**
+   * Sets path the sessions should be valid for, defaults to "/"
+   *
+   * @param  string $path
+   * @return self
+   */
+  public function in($path) {
+    $this->path= $path;
+    return $this;
+  }
+
+  /**
    * Returns session duration in seconds
    *
    * @return int
@@ -47,6 +59,13 @@ abstract class Sessions {
    * @return string
    */
   public function name() { return $this->cookie; }
+
+  /**
+   * Returns session cookie path
+   *
+   * @return string
+   */
+  public function path() { return $this->path; }
 
   /**
    * Returns session ID from request 
@@ -64,7 +83,7 @@ abstract class Sessions {
    * @return vod
    */
   public function attach($id, $response) {
-    $response->cookie((new Cookie($this->cookie, $id))->maxAge($this->duration));
+    $response->cookie((new Cookie($this->cookie, $id))->maxAge($this->duration)->path($this->path));
   }
 
   /**

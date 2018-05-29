@@ -14,7 +14,7 @@ use web\session\filesystem\Session;
  * @test  xp://web.session.unittest.InFileSystemTest
  */
 class InFileSystem extends Sessions {
-  private $path, $prefix, $random;
+  private $folder, $prefix, $random;
 
   /**
    * Creates a new filesystem-based factory
@@ -25,15 +25,15 @@ class InFileSystem extends Sessions {
    */
   public function __construct($path= null, $prefix= 'sess_') {
     if (null === $path) {
-      $this->path= new Folder(Environment::tempDir());
+      $this->folder= new Folder(Environment::tempDir());
     } else if ($path instanceof Folder) {
-      $this->path= $path;
+      $this->folder= $path;
     } else {
-      $this->path= new Folder($path);
+      $this->folder= new Folder($path);
     }
 
-    if (!is_writable($this->path->getURI())) {
-      throw new IllegalArgumentException('Path '.$this->path->getURI().' is not writable');
+    if (!is_writable($this->folder->getURI())) {
+      throw new IllegalArgumentException('Path '.$this->folder->getURI().' is not writable');
     }
 
     $this->prefix= $prefix;
@@ -44,7 +44,7 @@ class InFileSystem extends Sessions {
   public function gc() {
     $expiry= time() - $this->duration;
     $deleted= 0;
-    foreach (glob($this->path->getURI().$this->prefix.'*') as $file) {
+    foreach (glob($this->folder->getURI().$this->prefix.'*') as $file) {
       if (filectime($file) >= $expiry) continue;
 
       unlink($file);
@@ -63,7 +63,7 @@ class InFileSystem extends Sessions {
     $offset= 0;
 
     do {
-      $f= new File($this->path, $this->prefix.substr($buffer, $offset, 32));
+      $f= new File($this->folder, $this->prefix.substr($buffer, $offset, 32));
       if (!$f->exists()) {
         $this->gc();
         return new Session($this, $f, true, time() + $this->duration);
@@ -81,7 +81,7 @@ class InFileSystem extends Sessions {
    */
   public function locate($request) {
     if ($id= $this->id($request)) {
-      $f= new File($this->path->getURI(), $this->prefix.$id);
+      $f= new File($this->folder->getURI(), $this->prefix.$id);
       if ($f->exists()) {
         $created= $f->createdAt();
         if (time() - $created < $this->duration) {

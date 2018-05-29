@@ -40,6 +40,18 @@ abstract class SessionsTest extends TestCase {
   }
 
   #[@test]
+  public function named() {
+    $sessions= $this->fixture();
+    $this->assertEquals('SESS', $sessions->named('SESS')->name());
+  }
+
+  #[@test]
+  public function in() {
+    $sessions= $this->fixture();
+    $this->assertEquals('/sub', $sessions->in('/sub')->path());
+  }
+
+  #[@test]
   public function open() {
     $sessions= $this->fixture();
 
