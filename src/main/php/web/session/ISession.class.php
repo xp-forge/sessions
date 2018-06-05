@@ -53,7 +53,14 @@ interface ISession {
   public function remove($name);
 
   /**
-   * Transmits this session to the response
+   * Closes this session
+   *
+   * @return void
+   */
+  public function close();
+
+  /**
+   * Closes and transmits this session to the response
    *
    * @param  web.Response $response
    * @return void

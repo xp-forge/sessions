@@ -124,21 +124,12 @@ class Session implements ISession {
   }
 
   /**
-   * Transmits this session to the response
+   * Closes this session
    *
-   * @param  web.Response $response
    * @return void
    */
-  public function transmit($response) {
-    if ($this->new) {
-      $this->sessions->attach($this->id(), $response);
-      // Fall through, writing session data
-    } else if (time() >= $this->eol) {
-      $this->sessions->detach($this->id(), $response);
-      return;
-    } else if (empty($this->modifications)) {
-      return;
-    }
+  public function close() {
+    if (empty($this->modifications)) return;
 
     $this->file->open(File::READWRITE);
     $this->file->lockExclusive();
@@ -160,5 +151,24 @@ class Session implements ISession {
 
     $this->file->unLock();
     $this->file->close();
+  }
+
+  /**
+   * Transmits this session to the response
+   *
+   * @param  web.Response $response
+   * @return void
+   */
+  public function transmit($response) {
+    if ($this->new) {
+      $this->sessions->attach($this->id(), $response);
+      $this->new= false;
+      // Fall through, writing session data
+    } else if (time() >= $this->eol) {
+      $this->sessions->detach($this->id(), $response);
+      return;
+    }
+
+    $this->close();
   }
 }

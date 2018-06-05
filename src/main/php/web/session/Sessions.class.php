@@ -76,6 +76,16 @@ abstract class Sessions {
   public function id($request) { return $request->cookie($this->cookie); }
 
   /**
+   * Locates an existing and valid session; returns NULL if there is no such session.
+   *
+   * @param  web.Request $request
+   * @return web.session.ISession
+   */
+  public function locate($request) {
+    return ($id= $this->id($request)) ? $this->open($id) : null;
+  }
+
+  /**
    * Attaches session ID to response 
    *
    * @param  string $id
@@ -100,28 +110,15 @@ abstract class Sessions {
   /**
    * Creates a session
    *
-   * @return web.session.Session
+   * @return web.session.ISession
    */
   public abstract function create();
 
   /**
-   * Locates an existing and valid session; returns NULL if there is no such session.
+   * Opens an existing and valid session. Returns NULL if there is no such session.
    *
-   * @param  web.Request $request
+   * @param  string $id
    * @return web.session.ISession
    */
-  public abstract function locate($request);
-
-  /**
-   * Opens an existing and valid session. Like `locate()` but raises an exception of
-   * there is no such sessions.
-   *
-   * @param  web.Request $request
-   * @return web.session.ISession
-   * @throws web.session.NoSuchSession
-   */
-  public function open($request) {
-    if ($session= $this->locate($request)) return $session;
-    throw new NoSuchSession($this->id($request));
-  }
+  public abstract function open($id);
 }
