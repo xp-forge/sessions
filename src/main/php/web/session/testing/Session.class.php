@@ -90,7 +90,7 @@ class Session implements ISession {
    * @return void
    */
   public function close() {
-    $this->new= false;
+    // NOOP
   }
 
   /**
@@ -102,10 +102,13 @@ class Session implements ISession {
   public function transmit($response) {
     if ($this->new) {
       $this->sessions->attach($this->id(), $response);
-    } else if (time() < $this->eol) {
+      $this->new= false;
+      // Fall through, writing session data
+    } else if (time() >= $this->eol) {
       $this->sessions->detach($this->id(), $response);
       return;
     }
+
     $this->close();
   }
 }
