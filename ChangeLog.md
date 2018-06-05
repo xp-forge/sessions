@@ -3,6 +3,12 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.3.0 / 2018-06-05
+
+* Merged PR #3: Refactor session API: Standalone use vs. with request
+  and response. **Heads up:** This contains a breaking API change!
+  (@thekid)
+
 ## 0.2.0 / 2018-05-29
 
 * Added `Sessions::in($paths)` method to be able to influence the session 
