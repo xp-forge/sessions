@@ -36,6 +36,7 @@ class Session implements ISession {
   /** @return void */
   public function destroy() {
     $this->eol= time() - 1;
+    $this->new= false;
     $this->values= [];
   }
 
@@ -84,7 +85,16 @@ class Session implements ISession {
   }
 
   /**
-   * Transmits this session to the response
+   * Closes this session
+   *
+   * @return void
+   */
+  public function close() {
+    $this->new= false;
+  }
+
+  /**
+   * Closes and transmits this session to the response
    *
    * @param  web.Response $response
    * @return void
@@ -92,9 +102,10 @@ class Session implements ISession {
   public function transmit($response) {
     if ($this->new) {
       $this->sessions->attach($this->id(), $response);
-      $this->new= false;
     } else if (time() < $this->eol) {
       $this->sessions->detach($this->id(), $response);
+      return;
     }
+    $this->close();
   }
 }

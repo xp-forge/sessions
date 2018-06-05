@@ -74,21 +74,19 @@ class InFileSystem extends Sessions {
   }
 
   /**
-   * Locates an existing session; returns NULL if there is no such session.
+   * Opens an existing and valid session. 
    *
-   * @param  web.Request $request
-   * @return web.session.Session
+   * @param  string $id
+   * @return web.session.ISession
    */
-  public function locate($request) {
-    if ($id= $this->id($request)) {
-      $f= new File($this->folder->getURI(), $this->prefix.$id);
-      if ($f->exists()) {
-        $created= $f->createdAt();
-        if (time() - $created < $this->duration) {
-          return new Session($this, $f, false, $created + $this->duration);
-        }
-        $f->unlink();
+  public function open($id) {
+    $f= new File($this->folder->getURI(), $this->prefix.$id);
+    if ($f->exists()) {
+      $created= $f->createdAt();
+      if (time() - $created < $this->duration) {
+        return new Session($this, $f, false, $created + $this->duration);
       }
+      $f->unlink();
     }
     return null;
   }

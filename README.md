@@ -16,15 +16,15 @@ use web\session\{InFileSystem, ForTesting};
 
 // Instantiate session factory
 $sessions= new InFileSystem('/tmp');
-$sessions= (new ForTesting())->lasting(3600);
+$sessions= (new ForTesting())->lasting(3600)->named('psessionid');
 
 // Create a new session
 $session= $sessions->create();
 
-// Open an existing session
-$session= $sessions->open($request);
+// Open an existing session...
+if ($session= $sessions->open($sessionId)) { … }
 
-// ...or, if you'd like to do this conditionally
+// ...or locate session attached to a request
 if ($session= $sessions->locate($request)) { … }
 
 // Basic I/O operations
@@ -35,6 +35,11 @@ $session->remove('key');
 // Destroy
 $session->destroy();
 
-// Finally, transmit session to response. Ensure you always call this!
+// Close session...
+$session->close();
+
+// ...or close and then transmit session to response.
 $session->transmit($response);
 ```
+
+Ensure you always either call `close()` or `transmit()` to have the session data synchronized.

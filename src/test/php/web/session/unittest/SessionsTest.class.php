@@ -6,7 +6,6 @@ use web\io\TestOutput;
 use web\Request;
 use web\Response;
 use web\session\ISession;
-use web\session\NoSuchSession;
 use web\session\SessionInvalid;
 
 abstract class SessionsTest extends TestCase {
@@ -57,16 +56,15 @@ abstract class SessionsTest extends TestCase {
 
     $session= $sessions->create();
     $session->register('id', 'Test');
-    $session->transmit($this->response());
+    $session->close();
 
-    $session= $sessions->open($this->request($sessions->name().'='.$session->id()));
+    $session= $sessions->open($session->id());
     $this->assertEquals('Test', $session->value('id'));
   }
 
-  #[@test, @expect(NoSuchSession::class)]
+  #[@test]
   public function open_non_existant() {
-    $sessions= $this->fixture();
-    $sessions->open($this->request($sessions->name().'=@non-existant@'));
+    $this->assertNull($this->fixture()->open('@non-existant@'));
   }
 
   #[@test]
@@ -146,7 +144,7 @@ abstract class SessionsTest extends TestCase {
     $session->register('name', 'value');
     $session->transmit($this->response());
 
-    $session= $sessions->open($this->request($sessions->name().'='.$session->id()));
+    $session= $sessions->open($session->id());
     $value= $session->value('name');
 
     $this->assertEquals('value', $value);

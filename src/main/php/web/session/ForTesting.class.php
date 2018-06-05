@@ -22,13 +22,12 @@ class ForTesting extends Sessions {
   }
 
   /**
-   * Locates an existing session; returns NULL if there is no such session.
+   * Opens an existing and valid session. 
    *
-   * @param  web.Request $request
-   * @return web.session.Session
+   * @param  string $id
+   * @return web.session.ISession
    */
-  public function locate($request) {
-    $id= $this->id($request);
+  public function open($id) {
     if (isset($this->sessions[$id])) {
       if ($this->sessions[$id]->valid()) return $this->sessions[$id];
       unset($this->sessions[$id]);
