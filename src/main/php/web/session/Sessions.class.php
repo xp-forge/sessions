@@ -90,7 +90,7 @@ abstract class Sessions {
    *
    * @param  string $id
    * @param  web.Response $response
-   * @return vod
+   * @return void
    */
   public function attach($id, $response) {
     $response->cookie((new Cookie($this->cookie, $id))->maxAge($this->duration)->path($this->path));
@@ -101,7 +101,7 @@ abstract class Sessions {
    *
    * @param  string $id
    * @param  web.Response $response
-   * @return vod
+   * @return void
    */
   public function detach($id, $response) {
     $response->cookie(new Cookie($this->cookie, null));
