@@ -1,10 +1,10 @@
 <?php namespace web\session\unittest;
 
 use unittest\TestCase;
-use web\io\TestInput;
-use web\io\TestOutput;
 use web\Request;
 use web\Response;
+use web\io\TestInput;
+use web\io\TestOutput;
 use web\session\ISession;
 use web\session\SessionInvalid;
 
@@ -176,5 +176,26 @@ abstract class SessionsTest extends TestCase {
     $session= $this->fixture()->create();
     $session->destroy();
     $session->remove('any');
+  }
+
+  #[@test]
+  public function keys_initially_empty() {
+    $session= $this->fixture()->create();
+    $this->assertEquals([], $session->keys());
+  }
+
+  #[@test]
+  public function key() {
+    $session= $this->fixture()->create();
+    $session->register('name', 'value');
+    $this->assertEquals(['name'], $session->keys());
+  }
+
+  #[@test]
+  public function keys() {
+    $session= $this->fixture()->create();
+    $session->register('name1', 'value1');
+    $session->register('name2', 'value2');
+    $this->assertEquals(['name1', 'name2'], $session->keys());
   }
 }

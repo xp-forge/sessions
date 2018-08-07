@@ -33,6 +33,15 @@ class Session implements ISession {
   /** @return bool */
   public function valid() { return time() < $this->eol; }
 
+  /**
+   * Returns all session keys
+   *
+   * @return string[]
+   */
+  public function keys() {
+    return array_keys($this->values);
+  }
+
   /** @return void */
   public function destroy() {
     $this->eol= time() - 1;
