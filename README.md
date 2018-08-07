@@ -30,6 +30,7 @@ if ($session= $sessions->locate($request)) { … }
 // Basic I/O operations
 $session->register('key', 'value');
 $value= $session->value('key');
+$keys= $session->keys();
 $session->remove('key');
 
 // Destroy
