@@ -24,6 +24,13 @@ interface ISession {
   public function destroy();
 
   /**
+   * Returns all session keys
+   *
+   * @return string[]
+   */
+  public function keys();
+
+  /**
    * Registers a value - writing it to the session
    *
    * @param  string $name

@@ -1,8 +1,8 @@
 <?php namespace web\session\filesystem;
 
+use io\File;
 use web\session\ISession;
 use web\session\SessionInvalid;
-use io\File;
 
 /**
  * A session stored in the filesystem
@@ -83,6 +83,16 @@ class Session implements ISession {
     $this->eol= time() - 1;
     $this->new= false;
     $this->file->unlink();
+  }
+
+  /**
+   * Returns all session keys
+   *
+   * @return string[]
+   */
+  public function keys() {
+    $this->open();
+    return array_keys($this->values);
   }
 
   /**
