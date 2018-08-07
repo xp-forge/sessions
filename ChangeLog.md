@@ -3,6 +3,11 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.4.0 / 2018-08-07
+
+* Merged PR #5: Add web.session.ISession::keys() and implementations
+  (@thekid)
+
 ## 0.3.0 / 2018-06-05
 
 * Merged PR #3: Refactor session API: Standalone use vs. with request
