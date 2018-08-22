@@ -54,7 +54,7 @@ interface ISession {
    * Removes a value - deleting it from the session
    *
    * @param  string $name
-   * @return void
+   * @return bool Whether the value previously existed
    * @throws web.session.SessionInvalid
    */
   public function remove($name);

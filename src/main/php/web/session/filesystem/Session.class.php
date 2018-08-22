@@ -125,12 +125,18 @@ class Session implements ISession {
    * Removes a value - deleting it from the session
    *
    * @param  string $name
-   * @return void
+   * @return bool
    * @throws web.session.SessionInvalid
    */
   public function remove($name) {
     $this->open();
-    $this->modify($name, function() use($name) { unset($this->values[$name]); });
+
+    if (isset($this->values[$name])) {
+      $this->modify($name, function() use($name) { unset($this->values[$name]); });
+      return true;
+    } else {
+      return false;
+    } 
   }
 
   /**

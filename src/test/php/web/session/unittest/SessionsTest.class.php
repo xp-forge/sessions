@@ -125,14 +125,14 @@ abstract class SessionsTest extends TestCase {
   public function remove() {
     $session= $this->fixture()->create();
     $session->register('name', 'value');
-    $session->remove('name');
+    $this->assertTrue($session->remove('name'));
     $this->assertNull($session->value('name'));
   }
 
   #[@test]
   public function remove_non_existant() {
     $session= $this->fixture()->create();
-    $session->remove('name');
+    $this->assertFalse($session->remove('name'));
     $this->assertNull($session->value('name'));
   }
 

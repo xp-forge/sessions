@@ -83,14 +83,20 @@ class Session implements ISession {
    * Removes a value - deleting it from the session
    *
    * @param  string $name
-   * @return void
+   * @return bool
    * @throws web.session.SessionInvalid
    */
   public function remove($name) {
     if (time() >= $this->eol) {
       throw new SessionInvalid($this->id);
     }
-    unset($this->values[$name]);
+
+    if (isset($this->values[$name])) {
+      unset($this->values[$name]);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**

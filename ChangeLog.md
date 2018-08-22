@@ -3,6 +3,12 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.5.0 / 2018-08-22
+
+* Changed `ISession::remove()` to return whether the value being deleted
+  previously existed or not, and not *void*.
+  (@thekid)
+
 ## 0.4.0 / 2018-08-07
 
 * Merged PR #5: Add web.session.ISession::keys() and implementations
