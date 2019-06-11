@@ -51,6 +51,18 @@ abstract class SessionsTest extends TestCase {
   }
 
   #[@test]
+  public function secureByDefault() {
+    $sessions= $this->fixture();
+    $this->assertTrue($sessions->isSecure());
+  }
+
+  #[@test]
+  public function secureDisabled() {
+    $sessions= $this->fixture();
+    $this->assertFalse($sessions->disableSecure()->isSecure());
+  }
+
+  #[@test]
   public function open() {
     $sessions= $this->fixture();
 
