@@ -53,7 +53,7 @@ abstract class Sessions {
    * @param  bool $whether
    * @return self
    */
-  public function insecure(bool $whether) {
+  public function insecure($whether) {
     $this->secure= !$whether;
     return $this;
   }
