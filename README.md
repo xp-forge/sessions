@@ -52,5 +52,5 @@ As of 0.6.0, the [Secure flag](https://www.owasp.org/index.php/SecureFlag) is se
 
 ```php
 // This will omit the "Secure" flag from session cookies
-$sessions= (new InFileSystem('/tmp'))->insecure(true);
+$sessions= (new InFileSystem('/tmp'))->insecure('dev' === $this->environment->profile());
 ```
