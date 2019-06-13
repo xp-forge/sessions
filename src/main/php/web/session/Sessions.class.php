@@ -48,12 +48,13 @@ abstract class Sessions {
   }
 
   /**
-   * Disables to only transmit session cookie via secure connections (HTTPS).
+   * Sets whether secure transport for cookies should be enabled or disabled.
    *
+   * @param  bool $whether
    * @return self
    */
-  public function disableSecure() {
-    $this->secure= false;
+  public function insecure(bool $whether) {
+    $this->secure= !$whether;
     return $this;
   }
 

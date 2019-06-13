@@ -57,9 +57,15 @@ abstract class SessionsTest extends TestCase {
   }
 
   #[@test]
-  public function secureDisabled() {
+  public function secureWhenInsecureSetToFalse() {
     $sessions= $this->fixture();
-    $this->assertFalse($sessions->disableSecure()->isSecure());
+    $this->assertTrue($sessions->insecure(false)->isSecure());
+  }
+
+  #[@test]
+  public function notSecureWhenInsecureSetToTrue() {
+    $sessions= $this->fixture();
+    $this->assertFalse($sessions->insecure(true)->isSecure());
   }
 
   #[@test]
