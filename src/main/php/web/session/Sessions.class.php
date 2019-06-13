@@ -12,6 +12,7 @@ abstract class Sessions {
   protected $duration= 86400;
   protected $cookie= 'session';
   protected $path= '/';
+  protected $secure= true;
 
   /**
    * Sets how long a session should last. Defaults to one day.
@@ -47,6 +48,17 @@ abstract class Sessions {
   }
 
   /**
+   * Sets whether secure transport for cookies should be enabled or disabled.
+   *
+   * @param  bool $whether
+   * @return self
+   */
+  public function insecure(bool $whether) {
+    $this->secure= !$whether;
+    return $this;
+  }
+
+  /**
    * Returns session duration in seconds
    *
    * @return int
@@ -68,7 +80,14 @@ abstract class Sessions {
   public function path() { return $this->path; }
 
   /**
-   * Returns session ID from request 
+   * Returns whether session cookie is set with secure flag
+   *
+   * @return  bool
+   */
+  public function isSecure() { return $this->secure; }
+
+  /**
+   * Returns session ID from request
    *
    * @param  web.Request $request
    * @return string
@@ -93,7 +112,7 @@ abstract class Sessions {
    * @return void
    */
   public function attach($id, $response) {
-    $response->cookie((new Cookie($this->cookie, $id))->maxAge($this->duration)->path($this->path));
+    $response->cookie((new Cookie($this->cookie, $id))->maxAge($this->duration)->path($this->path)->secure($this->secure));
   }
 
   /**
