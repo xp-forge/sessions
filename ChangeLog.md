@@ -1,10 +1,12 @@
 Sessions for the XP Framework ChangeLog
 ========================================================================
 
-## 0.6.0 / ????-??-??
+## 0.6.0 / 2019-06-13
 
-* Changed session cookie to be transmitted via HTTPS only by default.
-* Added web.session.Session::insecure(bool $whether) to restore old behaviour.
+* Merged PR #6: Secure session cookies
+  - Changed session cookie to be transmitted via HTTPS only by default.
+  - Added web.session.Session::insecure(bool $whether) to restore old behaviour.
+  (@mikey179)
 
 ## 0.5.0 / 2018-08-22
 
