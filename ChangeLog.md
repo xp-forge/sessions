@@ -1,6 +1,10 @@
 Sessions for the XP Framework ChangeLog
 ========================================================================
 
+## 0.7.0 / ????-??-??
+
+* Added possibility to change sameSite attribute of session cookie
+
 ## 0.6.0 / 2019-06-13
 
 * Merged PR #6: Secure session cookies

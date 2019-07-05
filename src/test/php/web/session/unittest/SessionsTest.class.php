@@ -69,6 +69,19 @@ abstract class SessionsTest extends TestCase {
   }
 
   #[@test]
+  public function sameSiteIsLaxByDefault() {
+    $sessions= $this->fixture();
+    $this->assertTrue($sessions->sameSiteIs('Lax'));
+  }
+
+  #[@test]
+  public function sameSiteCanBeUnset() {
+    $sessions= $this->fixture();
+    $sessions->sameSite(null);
+    $this->assertTrue($sessions->sameSiteIs(null));
+  }
+
+  #[@test]
   public function open() {
     $sessions= $this->fixture();
 

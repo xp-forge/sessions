@@ -13,6 +13,7 @@ abstract class Sessions {
   protected $cookie= 'session';
   protected $path= '/';
   protected $secure= true;
+  protected $sameSite= 'Lax';
 
   /**
    * Sets how long a session should last. Defaults to one day.
@@ -59,6 +60,17 @@ abstract class Sessions {
   }
 
   /**
+   * Switch whether to transmit session cookie only to same site; preventing CSRF
+   *
+   * @param  string $sameSite one of "Strict", "Lax" or null (use the latter to remove)
+   * @return self
+   */
+  public function sameSite($sameSite) {
+    $this->sameSite= $sameSite;
+    return $this;
+  }
+
+  /**
    * Returns session duration in seconds
    *
    * @return int
@@ -85,6 +97,16 @@ abstract class Sessions {
    * @return  bool
    */
   public function isSecure() { return $this->secure; }
+
+  /**
+   * Returns whether sameSite attribute is set to given value.
+   *
+   * @param  string $value
+   * @return bool
+   */
+  public function sameSiteIs($value) {
+    return $this->sameSite === $value;
+  }
 
   /**
    * Returns session ID from request
