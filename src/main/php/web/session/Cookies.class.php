@@ -70,14 +70,17 @@ class Cookies implements Transport {
   }
 
   /**
-   * Extract session ID from request
+   * Locate session attached to request
    *
    * @param  web.session.Sessions $sessions
    * @param  web.Request $request
-   * @return string
+   * @return ?web.session.ISession
    */
-  public function id($sessions, $request) {
-    return $request->cookie($sessions->name());
+  public function locate($sessions, $request) {
+    if ($id= $request->cookie($sessions->name())) {
+      return $sessions->open($id);
+    }
+    return null;
   }
 
   /**
@@ -85,11 +88,11 @@ class Cookies implements Transport {
    *
    * @param  web.session.Sessions $sessions
    * @param  web.Response $response
-   * @param  string $id
+   * @param  web.session.ISession $session
    * @return void
    */
-  public function attach($sessions, $response, $id) {
-    $response->cookie((new Cookie($sessions->name(), $id))
+  public function attach($sessions, $response, $session) {
+    $response->cookie((new Cookie($sessions->name(), $session->id()))
       ->maxAge($sessions->duration())
       ->path($this->attributes['path'])
       ->secure($this->attributes['secure'])
@@ -104,10 +107,10 @@ class Cookies implements Transport {
    *
    * @param  web.session.Sessions $sessions
    * @param  web.Response $response
-   * @param  string $id
+   * @param  web.session.ISession $session
    * @return void
    */
-  public function detach($sessions, $response, $id) {
+  public function detach($sessions, $response, $session) {
     $response->cookie(new Cookie($sessions->name(), null));
   }
 }

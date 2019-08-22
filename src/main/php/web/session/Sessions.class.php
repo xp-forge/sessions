@@ -70,32 +70,32 @@ abstract class Sessions {
    * Locates an existing and valid session; returns NULL if there is no such session.
    *
    * @param  web.Request $request
-   * @return web.session.ISession
+   * @return ?web.session.ISession
    */
   public function locate($request) {
-    return ($id= $this->transport()->id($this, $request)) ? $this->open($id) : null;
+    return $this->transport()->locate($this, $request);
   }
 
   /**
-   * Attaches session ID to response 
+   * Attaches session to response 
    *
-   * @param  string $id
+   * @param  web.session.ISession $session
    * @param  web.Response $response
    * @return void
    */
-  public function attach($id, $response) {
-    $this->transport()->attach($this, $response, $id);
+  public function attach($session, $response) {
+    $this->transport()->attach($this, $response, $session);
   }
 
   /**
-   * Detaches session ID from response 
+   * Detaches session from response 
    *
-   * @param  string $id
+   * @param  web.session.ISession $session
    * @param  web.Response $response
    * @return void
    */
-  public function detach($id, $response) {
-    $this->transport()->detach($this, $response, $id);
+  public function detach($session, $response) {
+    $this->transport()->detach($this, $response, $session);
   }
 
   /**

@@ -116,11 +116,11 @@ class Session implements ISession {
    */
   public function transmit($response) {
     if ($this->new) {
-      $this->sessions->attach($this->id(), $response);
+      $this->sessions->attach($this, $response);
       $this->new= false;
       // Fall through, writing session data
     } else if (time() >= $this->eol) {
-      $this->sessions->detach($this->id(), $response);
+      $this->sessions->detach($this, $response);
       return;
     }
 
