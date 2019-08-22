@@ -118,6 +118,19 @@ abstract class SessionsTest extends TestCase {
   }
 
   #[@test]
+  public function detach() {
+    $sessions= $this->fixture();
+    $response= $this->response();
+
+    $session= $sessions->create();
+    $session->destroy();
+    $session->transmit($response);
+
+    $cookie= $response->cookies()[0];
+    $this->assertEquals([$sessions->name() => ''], [$cookie->name() => $cookie->value()]);
+  }
+
+  #[@test]
   public function valid() {
     $session= $this->fixture()->create();
     $this->assertTrue($session->valid());
