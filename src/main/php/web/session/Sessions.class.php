@@ -95,7 +95,7 @@ abstract class Sessions {
    * @return void
    */
   public function detach($id, $response) {
-    $this->transport()->detach($this, $response);
+    $this->transport()->detach($this, $response, $id);
   }
 
   /**

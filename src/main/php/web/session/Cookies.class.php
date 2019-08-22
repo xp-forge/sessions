@@ -104,9 +104,10 @@ class Cookies implements Transport {
    *
    * @param  web.session.Sessions $sessions
    * @param  web.Response $response
+   * @param  string $id
    * @return void
    */
-  public function detach($sessions, $response) {
+  public function detach($sessions, $response, $id) {
     $response->cookie(new Cookie($sessions->name(), null));
   }
 }
