@@ -48,9 +48,10 @@ Ensure you always either call `close()` or `transmit()` to have the session data
 Secure
 ------
 
-As of 0.6.0, the [Secure flag](https://www.owasp.org/index.php/SecureFlag) is set for all session cookies. If you develop on localhost using *http* only, you will need to tell the sessions instance as follows:
+The [Secure flag](https://www.owasp.org/index.php/SecureFlag) is set for all session cookies. If you develop on localhost using *http* only, you will need to tell the sessions instance as follows:
 
 ```php
-// This will omit the "Secure" flag from session cookies
-$sessions= (new InFileSystem('/tmp'))->insecure('dev' === $this->environment->profile());
+// This will omit the "Secure" flag from session cookies in dev environment
+$dev= 'dev' === $this->environment->profile();
+$sessions= (new InFileSystem('/tmp'))->via((new Cookies())->insecure($dev));
 ```
