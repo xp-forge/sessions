@@ -1,7 +1,6 @@
 <?php namespace web\session;
 
 use util\TimeSpan;
-use web\Cookie;
 
 /**
  * Base class for session factories
@@ -10,9 +9,8 @@ use web\Cookie;
  */
 abstract class Sessions {
   protected $duration= 86400;
-  protected $cookie= 'session';
-  protected $path= '/';
-  protected $secure= true;
+  protected $name= 'session';
+  protected $transport= null;
 
   /**
    * Sets how long a session should last. Defaults to one day.
@@ -26,35 +24,24 @@ abstract class Sessions {
   }
 
   /**
-   * Sets the cookie name
+   * Sets the session name
    *
-   * @param  string $cookie
+   * @param  string $name
    * @return self
    */
-  public function named($cookie) {
-    $this->cookie= $cookie;
+  public function named($name) {
+    $this->name= $name;
     return $this;
   }
 
   /**
-   * Sets path the sessions should be valid for, defaults to "/"
+   * Sets the session transport
    *
-   * @param  string $path
+   * @param  web.session.Transport $transport
    * @return self
    */
-  public function in($path) {
-    $this->path= $path;
-    return $this;
-  }
-
-  /**
-   * Sets whether secure transport for cookies should be enabled or disabled.
-   *
-   * @param  bool $whether
-   * @return self
-   */
-  public function insecure($whether) {
-    $this->secure= !$whether;
+  public function via($transport) {
+    $this->transport= $transport;
     return $this;
   }
 
@@ -66,33 +53,18 @@ abstract class Sessions {
   public function duration() { return $this->duration; }
 
   /**
-   * Returns session cookie name
+   * Returns session name
    *
    * @return string
    */
-  public function name() { return $this->cookie; }
+  public function name() { return $this->name; }
 
   /**
-   * Returns session cookie path
+   * Returns session transport
    *
    * @return string
    */
-  public function path() { return $this->path; }
-
-  /**
-   * Returns whether session cookie is set with secure flag
-   *
-   * @return  bool
-   */
-  public function isSecure() { return $this->secure; }
-
-  /**
-   * Returns session ID from request
-   *
-   * @param  web.Request $request
-   * @return string
-   */
-  public function id($request) { return $request->cookie($this->cookie); }
+  public function transport() { return $this->transport ?: $this->transport= new Cookies(); }
 
   /**
    * Locates an existing and valid session; returns NULL if there is no such session.
@@ -101,7 +73,7 @@ abstract class Sessions {
    * @return web.session.ISession
    */
   public function locate($request) {
-    return ($id= $this->id($request)) ? $this->open($id) : null;
+    return ($id= $this->transport()->id($this, $request)) ? $this->open($id) : null;
   }
 
   /**
@@ -112,7 +84,7 @@ abstract class Sessions {
    * @return void
    */
   public function attach($id, $response) {
-    $response->cookie((new Cookie($this->cookie, $id))->maxAge($this->duration)->path($this->path)->secure($this->secure));
+    $this->transport()->attach($this, $response, $id);
   }
 
   /**
@@ -123,7 +95,7 @@ abstract class Sessions {
    * @return void
    */
   public function detach($id, $response) {
-    $response->cookie(new Cookie($this->cookie, null));
+    $this->transport()->detach($this, $response);
   }
 
   /**

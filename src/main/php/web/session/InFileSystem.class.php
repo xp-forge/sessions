@@ -19,7 +19,7 @@ class InFileSystem extends Sessions {
   /**
    * Creates a new filesystem-based factory
    *
-   * @param io.Folder|io.Path|string $path
+   * @param  io.Folder|io.Path|string $path
    * @param  string $prefix Prefix all files, defaults to "sess_"
    * @throws lang.IllegalArgumentException if the path does not exist or is not writable
    */

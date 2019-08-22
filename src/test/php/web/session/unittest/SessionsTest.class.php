@@ -5,6 +5,7 @@ use web\Request;
 use web\Response;
 use web\io\TestInput;
 use web\io\TestOutput;
+use web\session\Cookies;
 use web\session\ISession;
 use web\session\SessionInvalid;
 
@@ -45,27 +46,16 @@ abstract class SessionsTest extends TestCase {
   }
 
   #[@test]
-  public function in() {
+  public function lasting() {
     $sessions= $this->fixture();
-    $this->assertEquals('/sub', $sessions->in('/sub')->path());
+    $this->assertEquals(43200, $sessions->lasting(43200)->duration());
   }
 
   #[@test]
-  public function secureByDefault() {
+  public function via() {
+    $transport= (new Cookies())->path('/sub');
     $sessions= $this->fixture();
-    $this->assertTrue($sessions->isSecure());
-  }
-
-  #[@test]
-  public function secureWhenInsecureSetToFalse() {
-    $sessions= $this->fixture();
-    $this->assertTrue($sessions->insecure(false)->isSecure());
-  }
-
-  #[@test]
-  public function notSecureWhenInsecureSetToTrue() {
-    $sessions= $this->fixture();
-    $this->assertFalse($sessions->insecure(true)->isSecure());
+    $this->assertEquals($transport, $sessions->via($transport)->transport());
   }
 
   #[@test]
