@@ -111,6 +111,8 @@ class Cookies implements Transport {
    * @return void
    */
   public function detach($sessions, $response, $session) {
-    $response->cookie(new Cookie($sessions->name(), null));
+    $response->cookie((new Cookie($sessions->name(), null))
+      ->path($this->attributes['path'])
+    );
   }
 }

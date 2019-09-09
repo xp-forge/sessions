@@ -1,7 +1,10 @@
 <?php namespace web\session\unittest;
 
 use unittest\TestCase;
+use web\io\TestOutput;
+use web\Response;
 use web\session\Cookies;
+use web\session\ForTesting;
 
 class CookiesTest extends TestCase {
 
@@ -59,5 +62,17 @@ class CookiesTest extends TestCase {
   public function http_only() {
     $fixture= new Cookies();
     $this->assertTrue($fixture->accessible(false)->attributes()['httpOnly']);
+  }
+
+  #[@test]
+  public function detach_missing_path_regression() {
+    $mockSessions= new ForTesting();
+    $fixture= new Cookies();
+    $fixture->path('/foo')->detach(
+      $mockSessions,
+      $mockResponse= new Response(new TestOutput()),
+      $mockSessions->create()
+    );
+    $this->assertEquals('/foo', $mockResponse->cookies()[0]->attributes()['path']);
   }
 }
