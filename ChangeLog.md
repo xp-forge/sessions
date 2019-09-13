@@ -1,6 +1,12 @@
 Sessions for the XP Framework ChangeLog
 ========================================================================
 
+## 1.0.1 / 2019-09-13
+
+* Fixed cookie transport to transmit path and domain when deleting the
+  cookie. See PR #9 for discussion.
+  (@thekid)
+
 ## 1.0.0 / 2019-08-23
 
 * **Heads up:** The `Sessions::in($path)` and `Sessions::insecure()`

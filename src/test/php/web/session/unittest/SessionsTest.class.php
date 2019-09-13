@@ -131,6 +131,32 @@ abstract class SessionsTest extends TestCase {
   }
 
   #[@test]
+  public function detach_uses_path() {
+    $sessions= $this->fixture()->via((new Cookies())->path('/testing'));
+    $response= $this->response();
+
+    $session= $sessions->create();
+    $session->destroy();
+    $session->transmit($response);
+
+    $cookie= $response->cookies()[0];
+    $this->assertEquals('/testing', $cookie->attributes()['path']);
+  }
+
+  #[@test]
+  public function detach_uses_domain() {
+    $sessions= $this->fixture()->via((new Cookies())->domain('example.org'));
+    $response= $this->response();
+
+    $session= $sessions->create();
+    $session->destroy();
+    $session->transmit($response);
+
+    $cookie= $response->cookies()[0];
+    $this->assertEquals('example.org', $cookie->attributes()['domain']);
+  }
+
+  #[@test]
   public function valid() {
     $session= $this->fixture()->create();
     $this->assertTrue($session->valid());
