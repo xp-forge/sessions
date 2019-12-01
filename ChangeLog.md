@@ -1,6 +1,12 @@
 Sessions for the XP Framework ChangeLog
 ========================================================================
 
+## ?.?.? / ????-??-??
+
+## 1.0.2 / 2019-12-01
+
+* Made compatible with XP 10 - @thekid
+
 ## 1.0.1 / 2019-09-13
 
 * Fixed cookie transport to transmit path and domain when deleting the
