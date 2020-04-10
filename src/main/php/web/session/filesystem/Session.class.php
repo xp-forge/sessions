@@ -1,8 +1,7 @@
 <?php namespace web\session\filesystem;
 
 use io\File;
-use web\session\ISession;
-use web\session\SessionInvalid;
+use web\session\{ISession, SessionInvalid};
 
 /**
  * A session stored in the filesystem

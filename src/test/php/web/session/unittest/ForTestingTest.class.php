@@ -1,7 +1,6 @@
 <?php namespace web\session\unittest;
 
-use web\session\ForTesting;
-use web\session\ISession;
+use web\session\{ForTesting, ISession};
 
 class ForTestingTest extends SessionsTest {
 

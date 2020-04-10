@@ -1,10 +1,7 @@
 <?php namespace web\session;
 
-use io\File;
-use io\Folder;
-use lang\Environment;
-use lang\IllegalArgumentException;
-use lang\IllegalStateException;
+use io\{File, Folder};
+use lang\{Environment, IllegalArgumentException, IllegalStateException};
 use util\Random;
 use web\session\filesystem\Session;
 

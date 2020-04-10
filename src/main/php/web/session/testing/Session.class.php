@@ -1,7 +1,6 @@
 <?php namespace web\session\testing;
 
-use web\session\ISession;
-use web\session\SessionInvalid;
+use web\session\{ISession, SessionInvalid};
 
 /**
  * A testing session

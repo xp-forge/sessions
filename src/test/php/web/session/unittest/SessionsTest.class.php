@@ -1,13 +1,9 @@
 <?php namespace web\session\unittest;
 
 use unittest\TestCase;
-use web\Request;
-use web\Response;
-use web\io\TestInput;
-use web\io\TestOutput;
-use web\session\Cookies;
-use web\session\ISession;
-use web\session\SessionInvalid;
+use web\{Request, Response};
+use web\io\{TestInput, TestOutput};
+use web\session\{Cookies, ISession, SessionInvalid};
 
 abstract class SessionsTest extends TestCase {
 

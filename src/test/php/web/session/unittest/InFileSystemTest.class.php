@@ -1,8 +1,7 @@
 <?php namespace web\session\unittest;
 
 use io\Folder;
-use lang\Environment;
-use lang\IllegalArgumentException;
+use lang\{Environment, IllegalArgumentException};
 use web\session\InFileSystem;
 
 class InFileSystemTest extends SessionsTest {
