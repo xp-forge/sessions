@@ -75,7 +75,7 @@ class Session implements ISession {
     if (time() >= $this->eol) {
       throw new SessionInvalid($this->id);
     }
-    return isset($this->values[$name]) ? $this->values[$name][0] : $default;
+    return $this->values[$name][0] ?? $default;
   }
 
   /**

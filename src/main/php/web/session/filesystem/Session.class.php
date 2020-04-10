@@ -117,7 +117,7 @@ class Session implements ISession {
    */
   public function value($name, $default= null) {
     $this->open();
-    return isset($this->values[$name]) ? $this->values[$name][0] : $default;
+    return $this->values[$name][0] ?? $default;
   }
 
   /**
