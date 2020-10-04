@@ -1,5 +1,6 @@
 <?php namespace web\session\unittest;
 
+use unittest\Test;
 use web\session\{ForTesting, ISession};
 
 class ForTestingTest extends SessionsTest {
@@ -7,12 +8,12 @@ class ForTestingTest extends SessionsTest {
   /** @return web.session.Sessions */
   protected function fixture() { return new ForTesting(); }
 
-  #[@test]
+  #[Test]
   public function all_initially_empty() {
     $this->assertEquals([], $this->fixture()->all());
   }
 
-  #[@test]
+  #[Test]
   public function all_after_creating_session() {
     $sessions= $this->fixture();
     $created= $sessions->create();

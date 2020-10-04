@@ -2,18 +2,19 @@
 
 use io\Folder;
 use lang\{Environment, IllegalArgumentException};
+use unittest\{AfterClass, BeforeClass, Expect, Test};
 use web\session\InFileSystem;
 
 class InFileSystemTest extends SessionsTest {
   private static $dir;
 
-  #[@beforeClass]
+  #[BeforeClass]
   public static function createSessionDir() {
     self::$dir= new Folder(Environment::tempDir(), uniqid());
     self::$dir->exists() || self::$dir->create(0777);
   }
 
-  #[@afterClass]
+  #[AfterClass]
   public static function removeSessionDir() {
     self::$dir->exists() && self::$dir->unlink();
   }
@@ -21,17 +22,17 @@ class InFileSystemTest extends SessionsTest {
   /** @return web.session.Sessions */
   protected function fixture() { return new InFileSystem(self::$dir); }
 
-  #[@test]
+  #[Test]
   public function can_create_without_argument() {
     new InFileSystem();
   }
 
-  #[@test, @expect(IllegalArgumentException::class)]
+  #[Test, Expect(IllegalArgumentException::class)]
   public function raises_error_when_non_existant_directory_is_given() {
     new InFileSystem('@does-not-exist@');
   }
 
-  #[@test]
+  #[Test]
   public function session_identifiers_consist_of_32_lowercase_hex_digits() {
     $sessions= $this->fixture();
     $id= $sessions->create()->id();

@@ -1,16 +1,16 @@
 <?php namespace web\session\unittest;
 
-use unittest\TestCase;
+use unittest\{Test, TestCase};
 use web\session\Cookies;
 
 class CookiesTest extends TestCase {
 
-  #[@test]
+  #[Test]
   public function can_create() {
     new Cookies();
   }
 
-  #[@test]
+  #[Test]
   public function defaults() {
     $fixture= new Cookies();
     $this->assertEquals(
@@ -19,43 +19,43 @@ class CookiesTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function in_path() {
     $fixture= new Cookies();
     $this->assertEquals('/sub', $fixture->path('/sub')->attributes()['path']);
   }
 
-  #[@test]
+  #[Test]
   public function under_domain() {
     $fixture= new Cookies();
     $this->assertEquals('example.org', $fixture->domain('example.org')->attributes()['domain']);
   }
 
-  #[@test]
+  #[Test]
   public function same_site() {
     $fixture= new Cookies();
     $this->assertEquals('Strict', $fixture->sameSite('Strict')->attributes()['sameSite']);
   }
 
-  #[@test]
+  #[Test]
   public function secure() {
     $fixture= new Cookies();
     $this->assertTrue($fixture->insecure(false)->attributes()['secure']);
   }
 
-  #[@test]
+  #[Test]
   public function insecure() {
     $fixture= new Cookies();
     $this->assertFalse($fixture->insecure(true)->attributes()['secure']);
   }
 
-  #[@test]
+  #[Test]
   public function accessible() {
     $fixture= new Cookies();
     $this->assertFalse($fixture->accessible(true)->attributes()['httpOnly']);
   }
 
-  #[@test]
+  #[Test]
   public function http_only() {
     $fixture= new Cookies();
     $this->assertTrue($fixture->accessible(false)->attributes()['httpOnly']);
