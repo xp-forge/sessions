@@ -3,6 +3,11 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.1.0 / 2021-01-03
+
+* Made `web.session.ISession` interface implement `lang.Closeable`
+  (@thekid)
+
 ## 2.0.0 / 2020-04-10
 
 * Implemented xp-framework/rfc#334: Drop PHP 5.6:

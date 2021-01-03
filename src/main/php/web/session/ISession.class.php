@@ -1,6 +1,8 @@
 <?php namespace web\session;
 
-interface ISession {
+use lang\Closeable;
+
+interface ISession extends Closeable {
 
   /**
    * Returns the session identifier
