@@ -62,7 +62,7 @@ abstract class Sessions {
   /**
    * Returns session transport
    *
-   * @return string
+   * @return web.session.Transport
    */
   public function transport() { return $this->transport ?: $this->transport= new Cookies(); }
 
