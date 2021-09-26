@@ -3,6 +3,10 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.1.1 / 2021-09-26
+
+* Made compatible with XP web 3.0, see xp-forge/web#83 - @thekid
+
 ## 2.1.0 / 2021-01-03
 
 * Made `web.session.ISession` interface implement `lang.Closeable`
