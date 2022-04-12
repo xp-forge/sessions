@@ -45,6 +45,18 @@ $session->transmit($response);
 
 Ensure you always either call `close()` or `transmit()` to have the session data synchronized.
 
+Implementations
+---------------
+This library includes the following implementations:
+
+* `web.session.InFileSystem` - using the local filesystem with serialized data
+* `web.session.ForTesting` - in-memory sessions, for testing purposes
+
+Other implementations provide solutions for clustering:
+
+* https://github.com/xp-forge/redis-sessions
+* https://github.com/xp-forge/mongo-sessions
+
 Secure
 ------
 
