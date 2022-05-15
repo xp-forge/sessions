@@ -6,7 +6,7 @@ use web\Cookie;
 use web\session\cookie\{Session, Format};
 
 class CookieBased extends Sessions {
-  private $key, $signing;
+  private $key, $format;
   private $attributes= [
     'path'     => '/',
     'secure'   => true,
