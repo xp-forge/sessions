@@ -1,8 +1,9 @@
 <?php namespace web\session;
 
+use lang\FormatException;
 use util\Secret;
 use web\Cookie;
-use web\session\cookie\Session;
+use web\session\cookie\{Session, Format};
 
 class CookieBased extends Sessions {
   private $key, $signing;
@@ -18,11 +19,27 @@ class CookieBased extends Sessions {
    * Creates an new cookie-based session
    *
    * @param  string|util.Secret $key
-   * @param  string|util.Secret $signing
+   * @param  ?web.session.cookie.Format $format
    */
-  public function __construct($key, $signing) {
+  public function __construct($key, Format $format= null) {
     $this->key= $key instanceof Secret ? $key : new Secret($key);
-    $this->signing= $signing instanceof Secret ? $signing : new Secret($signing);
+    $this->format= $format ?? Format::available()[0];
+  }
+
+  /**
+   * Sets the session transport
+   *
+   * @param  web.session.Transport $transport
+   * @return self
+   */
+  public function via($transport) {
+
+    // Special-case handling for Cookies-transport
+    if ($transport instanceof Cookies) {
+      $this->attributes= $transport->attributes();
+    }
+
+    return parent::via($transport);
   }
 
   /**
@@ -55,7 +72,7 @@ class CookieBased extends Sessions {
    * @return void
    */
   public function attach($session, $response) {
-    $response->cookie((new Cookie($this->name(), $session->id()))
+    $response->cookie((new Cookie($this->name, $session->id()))
       ->maxAge($this->duration())
       ->path($this->attributes['path'])
       ->secure($this->attributes['secure'])
@@ -96,20 +113,7 @@ class CookieBased extends Sessions {
    * @return string
    */
   private function decode($input) {
-    if ($r= strlen($input) % 4) {
-      $input.= str_repeat('=', 4 - $r);
-    }
-    return base64_decode(strtr($input, '_-', '/+'));
-  }
-
-  /**
-   * Signs given input and returns it in URL-safe base64
-   * 
-   * @param  string $input
-   * @return string
-   */
-  private function sign($input) {
-    return $this->encode(hash_hmac('SHA256', $input, $this->signing->reveal(), true));
+    return base64_decode(strtr($input, '_-', '/+').'===');
   }
 
   /**
@@ -120,8 +124,7 @@ class CookieBased extends Sessions {
    * @return string
    */
   public function serialize($claims) {
-    $payload= $this->encode('{"alg":"HS256","typ":"JWT"}').'.'.$this->encode(json_encode($claims));
-    return $payload.'.'.$this->sign($payload);
+    return $this->format->id().$this->encode($this->format->encrypt(json_encode($claims), $this->key));
   }
 
   /**
@@ -131,7 +134,7 @@ class CookieBased extends Sessions {
    */
   public function create() {
     $now= time();
-    return new Session($this, ['iat' => $now, 'exp' => $now + $this->duration]);
+    return new Session($this, ['val' => [], 'exp' => $now + $this->duration]);
   }
 
   /**
@@ -142,16 +145,21 @@ class CookieBased extends Sessions {
    */
   public function open($id) {
 
-    // ID is a JWT with a "HS256" signature containing an encrypted payload. We
-    // ignore the header segment completely as we know how we issued the JWT!
-    $segments= explode('.', $id);
-    if (3 !== sizeof($segments)) return null;
-    if ($segments[2] !== $this->sign($segments[0].'.'.$segments[1])) return null;
+    // ID[0] is format identifier, the rest is the encrypted text. If the
+    // identifiers don't match, regard the session as invalid.
+    if ($this->format->id() !== ($id[0] ?? null)) return null;
+
+    // If the ciphertext has been tampered with, the format implementation will
+    // raise an exception - handle this silently like an invalid session.
+    try {
+      $claims= json_decode($this->format->decrypt($this->decode(substr($id, 1)), $this->key), true);
+    } catch (FormatException $e) {
+      return null;
+    }
 
     // Check expiry time
-    $values= json_decode($this->decode($segments[1]), true);
-    if (time() > $values['exp']) return null;
+    if (time() > $claims['exp']) return null;
 
-    return new Session($this, $values);
+    return new Session($this, $claims);
   }
 }

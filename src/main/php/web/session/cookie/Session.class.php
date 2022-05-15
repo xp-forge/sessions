@@ -11,6 +11,7 @@ use web\session\{ISession, SessionInvalid};
 class Session implements ISession {
   private $sessions;
   public $claims;
+  private $id= null;
   private $modified= false;
 
   /**
@@ -25,7 +26,7 @@ class Session implements ISession {
   }
 
   /** @return string */
-  public function id() { return $this->sessions->serialize($this->claims); }
+  public function id() { return $this->id ?? $this->id= $this->sessions->serialize($this->claims); }
 
   /** @return bool */
   public function valid() { return time() < $this->claims['exp']; }
@@ -59,6 +60,7 @@ class Session implements ISession {
 
     $this->claims['val'][$name]= [$value];
     $this->modified= true;
+    $this->id= null;
   }
 
   /**
@@ -91,7 +93,9 @@ class Session implements ISession {
 
     if (!isset($this->claims['val'][$name])) return false;
     unset($this->claims['val'][$name]);
-    return $this->modified= true;
+    $this->modified= true;
+    $this->id= null;
+    return true;
   }
 
   /**
