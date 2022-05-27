@@ -3,10 +3,10 @@
 use lang\FormatException;
 use util\Secret;
 use web\Cookie;
-use web\session\cookie\{Session, Format};
+use web\session\cookie\{Session, Encryption};
 
 class CookieBased extends Sessions {
-  private $key, $format;
+  private $encryption;
   private $attributes= [
     'path'     => '/',
     'secure'   => true,
@@ -19,11 +19,10 @@ class CookieBased extends Sessions {
    * Creates an new cookie-based session
    *
    * @param  string|util.Secret $key
-   * @param  ?web.session.cookie.Format $format
+   * @param  ?web.session.cookie.Encryption $encryption
    */
-  public function __construct($key, Format $format= null) {
-    $this->key= $key instanceof Secret ? $key : new Secret($key);
-    $this->format= $format ?? Format::available()[0];
+  public function __construct($key, Encryption $encryption= null) {
+    $this->encryption= $encryption ?? Encryption::available($key instanceof Secret ? $key : new Secret($key))[0];
   }
 
   /**
@@ -125,7 +124,7 @@ class CookieBased extends Sessions {
    * @return string
    */
   public function serialize($values, $expire) {
-    return $this->format->id().$this->encode($this->format->encrypt(json_encode([$values, $expire]), $this->key));
+    return $this->encryption->id().$this->encode($this->encryption->encrypt(json_encode([$values, $expire])));
   }
 
   /**
@@ -146,14 +145,14 @@ class CookieBased extends Sessions {
    */
   public function open($id) {
 
-    // ID[0] is format identifier, the rest is the encrypted text. If the
+    // ID[0] is encryption identifier, the rest is the encrypted text. If the
     // identifiers don't match, regard the session as invalid.
-    if ($this->format->id() !== ($id[0] ?? null)) return null;
+    if ($this->encryption->id() !== ($id[0] ?? null)) return null;
 
-    // If the ciphertext has been tampered with, the format implementation will
+    // If the ciphertext has been tampered with, the encryption implementation will
     // raise an exception - handle this silently like an invalid session.
     try {
-      $serialized= json_decode($this->format->decrypt($this->decode(substr($id, 1)), $this->key), true);
+      $serialized= json_decode($this->encryption->decrypt($this->decode(substr($id, 1))), true);
     } catch (FormatException $e) {
       return null;
     }
