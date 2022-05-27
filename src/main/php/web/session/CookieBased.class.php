@@ -5,6 +5,19 @@ use util\Secret;
 use web\Cookie;
 use web\session\cookie\{Session, Encryption};
 
+/**
+ * Cookie-based sessions. The session data is encrypted in the cookie and
+ * then encoded in base64 to use 7 bit only. The first byte controls the
+ * algorithm used:
+ *
+ * - `s` for Sodium, using sodium_crypto_box_open()
+ * - `o` for OpenSSL, using openssl_encrypt()
+ *
+ * The encrypted value is signed by a hash to detect any bit flipping attacks.
+ *
+ * @see   https://github.com/SaintFlipper/EncryptedSession
+ * @test  web.session.unittest.CookieBasedTest
+ */
 class CookieBased extends Sessions {
   private $encryption;
   private $attributes= [
