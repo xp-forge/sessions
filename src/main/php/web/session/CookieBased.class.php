@@ -99,6 +99,7 @@ class CookieBased extends Sessions {
   /**
    * URL-safe base64 encoding
    *
+   * @see    https://datatracker.ietf.org/doc/html/rfc4648#section-5
    * @param  string $input
    * @return string
    */

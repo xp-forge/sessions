@@ -61,7 +61,6 @@ abstract class Format extends Enum {
    */
   public abstract function id();
 
-
   /**
    * Encrypt given plain text input
    *
