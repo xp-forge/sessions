@@ -9,8 +9,7 @@ use web\session\{ISession, SessionInvalid};
  * @see   xp://web.session.CookieBased
  */
 class Session implements ISession {
-  private $sessions;
-  public $claims;
+  private $sessions, $values, $expire;
   private $id= null;
   private $modified= false;
 
@@ -18,22 +17,24 @@ class Session implements ISession {
    * Creates a new cookie-based session
    *
    * @param  web.session.Sessions $sessions
-   * @param  [:var] $claims
+   * @param  [:var] $values
+   * @param  int $expire
    */
-  public function __construct($sessions, $claims) {
+  public function __construct($sessions, $values, $expire) {
     $this->sessions= $sessions;
-    $this->claims= $claims;
+    $this->values= $values;
+    $this->expire= $expire;
   }
 
   /** @return string */
-  public function id() { return $this->id ?? $this->id= $this->sessions->serialize($this->claims); }
+  public function id() { return $this->id ?? $this->id= $this->sessions->serialize($this->values, $this->expire); }
 
   /** @return bool */
-  public function valid() { return time() < $this->claims['exp']; }
+  public function valid() { return time() < $this->expire; }
 
   /** @return void */
   public function destroy() {
-    $this->claims['exp']= time() - 1;
+    $this->expire= time() - 1;
   }
 
   /**
@@ -42,7 +43,7 @@ class Session implements ISession {
    * @return string[]
    */
   public function keys() {
-    return array_keys($this->claims['val']);
+    return array_keys($this->values);
   }
 
   /**
@@ -54,11 +55,11 @@ class Session implements ISession {
    * @throws web.session.SessionInvalid
    */
   public function register($name, $value) {
-    if (time() >= $this->claims['exp']) {
+    if (time() >= $this->expire) {
       throw new SessionInvalid($this->id());
     }
 
-    $this->claims['val'][$name]= [$value];
+    $this->values[$name]= [$value];
     $this->modified= true;
     $this->id= null;
   }
@@ -72,11 +73,11 @@ class Session implements ISession {
    * @throws web.session.SessionInvalid
    */
   public function value($name, $default= null) {
-    if (time() >= $this->claims['exp']) {
+    if (time() >= $this->expire) {
       throw new SessionInvalid($this->id());
     }
 
-    return $this->claims['val'][$name][0] ?? $default;
+    return $this->values[$name][0] ?? $default;
   }
 
   /**
@@ -87,12 +88,12 @@ class Session implements ISession {
    * @throws web.session.SessionInvalid
    */
   public function remove($name) {
-    if (time() >= $this->claims['exp']) {
+    if (time() >= $this->expire) {
       throw new SessionInvalid($this->id());
     }
 
-    if (!isset($this->claims['val'][$name])) return false;
-    unset($this->claims['val'][$name]);
+    if (!isset($this->values[$name])) return false;
+    unset($this->values[$name]);
     $this->modified= true;
     $this->id= null;
     return true;
@@ -114,7 +115,7 @@ class Session implements ISession {
    * @return void
    */
   public function transmit($response) {
-    if (time() >= $this->claims['exp']) {
+    if (time() >= $this->expire) {
       $this->sessions->detach($this, $response);
     } else if ($this->modified) {
       $this->sessions->attach($this, $response);

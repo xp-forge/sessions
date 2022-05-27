@@ -119,12 +119,12 @@ class CookieBased extends Sessions {
   /**
    * Creates the serialized form
    * 
-   * @see    https://www.rfc-editor.org/rfc/rfc7515.html
-   * @param  [:var] $claims
+   * @param  [:var] $value
+   * @param  int $expire
    * @return string
    */
-  public function serialize($claims) {
-    return $this->format->id().$this->encode($this->format->encrypt(json_encode($claims), $this->key));
+  public function serialize($values, $expire) {
+    return $this->format->id().$this->encode($this->format->encrypt(json_encode([$values, $expire]), $this->key));
   }
 
   /**
@@ -134,7 +134,7 @@ class CookieBased extends Sessions {
    */
   public function create() {
     $now= time();
-    return new Session($this, ['val' => [], 'exp' => $now + $this->duration]);
+    return new Session($this, [], $now + $this->duration);
   }
 
   /**
@@ -152,14 +152,14 @@ class CookieBased extends Sessions {
     // If the ciphertext has been tampered with, the format implementation will
     // raise an exception - handle this silently like an invalid session.
     try {
-      $claims= json_decode($this->format->decrypt($this->decode(substr($id, 1)), $this->key), true);
+      $serialized= json_decode($this->format->decrypt($this->decode(substr($id, 1)), $this->key), true);
     } catch (FormatException $e) {
       return null;
     }
 
     // Check expiry time
-    if (time() > $claims['exp']) return null;
+    if (time() > $serialized[1]) return null;
 
-    return new Session($this, $claims);
+    return new Session($this, ...$serialized);
   }
 }
