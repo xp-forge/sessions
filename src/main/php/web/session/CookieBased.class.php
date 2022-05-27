@@ -18,11 +18,15 @@ class CookieBased extends Sessions {
   /**
    * Creates an new cookie-based session
    *
-   * @param  string|util.Secret $key
-   * @param  ?web.session.cookie.Encryption $encryption
+   * @param  string|util.Secret|web.session.cookie.Encryption $arg
+   * @throws lang.IllegalStateException
    */
-  public function __construct($key, Encryption $encryption= null) {
-    $this->encryption= $encryption ?? Encryption::available($key instanceof Secret ? $key : new Secret($key))[0];
+  public function __construct($arg) {
+    if ($arg instanceof Encryption) {
+      $this->encryption= $arg;
+    } else {
+      $this->encryption= Encryption::using($arg instanceof Secret ? $arg : new Secret($arg));
+    }
   }
 
   /**

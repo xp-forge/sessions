@@ -1,6 +1,6 @@
 <?php namespace web\session\cookie;
 
-use lang\IllegalArgumentException;
+use lang\{IllegalArgumentException, IllegalStateException};
 use util\Secret;
 
 abstract class Encryption {
@@ -43,15 +43,30 @@ abstract class Encryption {
   public abstract function decrypt($input);
 
   /**
-   * Returns all available format implementations
+   * Instantiates a new encryption implementation using the given key.
+   * If no implementations are availale, raises an exception.
    *
    * @param  util.Secret $key
-   * @return self[]
+   * @return self
+   * @throws lang.IllegalStateException
+   */
+  public static function using(Secret $key) {
+    foreach (self::available($key) as $impl) {
+      return $impl;
+    }
+
+    throw new IllegalStateException('No encryption implementations available');
+  }
+
+  /**
+   * Returns all available format implementations. Prefers *Sodium*,
+   * then checks to see if *OpenSSL* is available.
+   *
+   * @param  util.Secret $key
+   * @return iterable
    */
   public static function available(Secret $key) {
-    $r= [];
-    extension_loaded('sodium') && $r[]= new Sodium($key);
-    extension_loaded('openssl') && $r[]= new OpenSSL($key);
-    return $r;
+    extension_loaded('sodium') && yield new Sodium($key);
+    extension_loaded('openssl') && yield new OpenSSL($key);
   }
 }
