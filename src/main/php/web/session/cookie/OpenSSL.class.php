@@ -6,6 +6,7 @@ use lang\FormatException;
  * Encrypts cookies using openssl functions
  *
  * @ext   openssl
+ * @see   https://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html
  * @test  web.session.unittest.CookieFormatTest
  */
 class OpenSSL extends Encryption {
