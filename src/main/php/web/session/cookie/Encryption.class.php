@@ -19,7 +19,8 @@ abstract class Encryption {
   }
 
   /**
-   * Returns a unique one-character identifier for the given format
+   * Returns a unique identifier for the given format consisting
+   * of one uppercase character.
    *
    * @return string
    */

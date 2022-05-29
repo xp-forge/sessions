@@ -13,7 +13,7 @@ class OpenSSL extends Encryption {
   const METHOD = 'AES-256-CBC';
   const IV_LEN = 16;
 
-  public function id() { return 'o'; }
+  public function id() { return 'O'; }
 
   public function encrypt($input) {
     $iv= openssl_random_pseudo_bytes(self::IV_LEN);

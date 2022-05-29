@@ -1,12 +1,11 @@
 <?php namespace web\session\cookie;
 
-use io\File;
 use web\session\{ISession, SessionInvalid};
 
 /**
  * A session stored in a cookie
  *
- * @see   xp://web.session.CookieBased
+ * @see   web.session.CookieBased
  */
 class Session implements ISession {
   private $sessions, $values, $expire;

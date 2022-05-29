@@ -10,7 +10,7 @@ use lang\FormatException;
  */
 class Sodium extends Encryption {
 
-  public function id() { return 's'; }
+  public function id() { return 'S'; }
 
   public function encrypt($input) {
     $nonce= random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);

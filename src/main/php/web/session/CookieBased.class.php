@@ -3,7 +3,7 @@
 use lang\FormatException;
 use util\Secret;
 use web\Cookie;
-use web\session\cookie\{Session, Encryption};
+use web\session\cookie\{Session, Encryption, Compression};
 
 /**
  * Cookie-based sessions. The session data is encrypted in the cookie and
@@ -40,6 +40,7 @@ class CookieBased extends Sessions {
     } else {
       $this->encryption= Encryption::using($arg instanceof Secret ? $arg : new Secret($arg));
     }
+    $this->compression= new Compression();
   }
 
   /**
@@ -141,7 +142,17 @@ class CookieBased extends Sessions {
    * @return string
    */
   public function serialize($values, $expire) {
-    return $this->encryption->id().$this->encode($this->encryption->encrypt(json_encode([$values, $expire])));
+    $value= json_encode([$values, $expire]);
+
+    // Indicate compressed using lowercase identifiers
+    if ($this->compression->worthwhile(strlen($value))) {
+      $id= strtolower($this->encryption->id());
+      $value= $this->compression->compress($value);
+    } else {
+      $id= $this->encryption->id();
+    }
+
+    return $id.$this->encode($this->encryption->encrypt($value));
   }
 
   /**
@@ -157,25 +168,32 @@ class CookieBased extends Sessions {
   /**
    * Opens an existing and valid session. 
    *
-   * @param  string $id
+   * @param  string $token
    * @return ?web.session.ISession
    */
-  public function open($id) {
+  public function open($token) {
 
-    // ID[0] is encryption identifier, the rest is the encrypted text. If the
-    // identifiers don't match, regard the session as invalid.
-    if ($this->encryption->id() !== ($id[0] ?? null)) return null;
+    // The first byte is an identifier indicating the encryption algorithm used. If
+    // this identifier doesn't match the one in use, regard the session as invalid.
+    if (0 !== strncasecmp($this->encryption->id(), $token, 1)) return null;
 
     // If the ciphertext has been tampered with, the encryption implementation will
     // raise an exception - handle this silently like an invalid session.
     try {
-      $serialized= json_decode($this->encryption->decrypt($this->decode(substr($id, 1))), true);
+      $plain= $this->encryption->decrypt($this->decode(substr($token, 1)));
     } catch (FormatException $e) {
       return null;
     }
 
-    // Check expiry time
-    if (time() > $serialized[1]) return null;
+    // The identifier in lowercase indicates compressed data, see serialize()
+    if ($token[0] >= 'a') {
+      $serialized= json_decode($this->compression->decompress($plain), true);
+    } else {
+      $serialized= json_decode($plain, true);
+    }
+
+    // Check JSON is valid, then check expiry time
+    if (null === $serialized || time() > $serialized[1]) return null;
 
     return new Session($this, ...$serialized);
   }
