@@ -49,9 +49,9 @@ abstract class SessionsTest extends TestCase {
 
   #[Test]
   public function via() {
-    $transport= (new Cookies())->path('/sub');
+    $cookies= (new Cookies())->path('/sub');
     $sessions= $this->fixture();
-    $this->assertEquals($transport, $sessions->via($transport)->transport());
+    $this->assertEquals($cookies, $sessions->via($cookies)->cookies());
   }
 
   #[Test]
