@@ -56,6 +56,7 @@ Other implementations provide solutions for clustering:
 
 * https://github.com/xp-forge/redis-sessions
 * https://github.com/xp-forge/mongo-sessions
+* https://github.com/xp-forge/cookie-sessions
 
 Secure
 ------
