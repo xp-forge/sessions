@@ -85,10 +85,7 @@ abstract class Sessions {
    * @return void
    */
   public function attach($session, $response) {
-    $response->cookie($this->cookies()
-      ->create($this->name, $session->id())
-      ->maxAge($this->duration)
-    );
+    $response->cookie($this->cookies()->create($this->name, $session->id())->maxAge($this->duration));
   }
 
   /**
