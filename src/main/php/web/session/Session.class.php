@@ -3,11 +3,17 @@
 use lang\Closeable;
 
 abstract class Session implements Closeable {
-  protected $sessions;
+  protected $sessions, $expire;
 
-  /** @param web.session.Sessions $sessions */
-  public function __construct($sessions) {
+  /**
+   * Creates a new session
+   *
+   * @param  web.session.Sessions $sessions
+   * @param  int $expire
+   */
+  public function __construct($sessions, $expire) {
     $this->sessions= $sessions;
+    $this->expire= $expire;
   }
 
   /**
@@ -22,7 +28,7 @@ abstract class Session implements Closeable {
    *
    * @return bool
    */
-  public abstract function valid();
+  public function valid() { return time() < $this->expire; }
 
   /**
    * Returns whether the session has been modified
@@ -88,7 +94,7 @@ abstract class Session implements Closeable {
    * @param  web.Response $response
    * @return void
    */
-  public function transmit($response) {
+  public final function transmit($response) {
     if (!$this->valid()) {
       $this->sessions->detach($this, $response);
     } else if ($this->modified()) {

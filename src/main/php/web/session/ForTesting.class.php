@@ -18,7 +18,7 @@ class ForTesting extends Sessions {
    */
   public function create() {
     $id= uniqid(microtime(true));
-    return $this->sessions[$id]= new Implementation($this, $id, true, time() + $this->duration);
+    return $this->sessions[$id]= new Implementation($this, time() + $this->duration, $id, true);
   }
 
   /**

@@ -65,7 +65,7 @@ class InFileSystem extends Sessions {
       if (!$f->exists()) {
         $this->gc();
         $f->touch();
-        return new Implementation($this, $f, [], time() + $this->duration);
+        return new Implementation($this, time() + $this->duration, $f, []);
       }
     } while ($offset++ < 32);
 
@@ -83,7 +83,7 @@ class InFileSystem extends Sessions {
     if ($f->exists()) {
       $created= $f->createdAt();
       if (time() - $created < $this->duration) {
-        return new Implementation($this, $f, null, $created + $this->duration);
+        return new Implementation($this, $created + $this->duration, $f, null);
       }
       $f->unlink();
     }

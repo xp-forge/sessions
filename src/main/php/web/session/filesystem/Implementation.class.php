@@ -10,29 +10,25 @@ use web\session\{Session, SessionInvalid};
  * @test  web.session.unittest.InFileSystemTest
  */
 class Implementation extends Session {
-  private $file, $values, $eol;
+  private $file, $values;
   private $modifications= [];
 
   /**
    * Creates a new file-based session
    *
    * @param  web.session.Sessions $sessions
+   * @param  int $expire
    * @param  string|io.File $file
    * @param  ?[:var] $values
-   * @param  int $eol
    */
-  public function __construct($sessions, $file, $values, $eol) {
-    parent::__construct($sessions);
+  public function __construct($sessions, $expire, $file, $values) {
+    parent::__construct($sessions, $expire);
     $this->file= $file instanceof File ? $file : new File($file);
     $this->values= $values;
-    $this->eol= $eol;
   }
 
   /** @return string */
   public function token() { return substr($this->file->getFileName(), strlen($this->sessions->prefix)); }
-
-  /** @return bool */
-  public function valid() { return time() < $this->eol; }
 
   /** @return bool */
   public function modified() { return !empty($this->modifications); }
@@ -50,7 +46,7 @@ class Implementation extends Session {
    * @throws web.session.SessionInvalid
    */
   private function open() {
-    if (time() >= $this->eol) {
+    if (time() >= $this->expire) {
       throw new SessionInvalid($this->token());
     } else if (null !== $this->values) {
       return;
@@ -77,7 +73,7 @@ class Implementation extends Session {
 
   /** @return void */
   public function destroy() {
-    $this->eol= time() - 1;
+    $this->expire= time() - 1;
     $this->file->unlink();
   }
 

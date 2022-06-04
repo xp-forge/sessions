@@ -9,22 +9,21 @@ use web\session\{Session, SessionInvalid};
  * @test  web.session.unittest.ForTestingTest
  */
 class Implementation extends Session {
-  private $modified, $token, $eol;
+  private $modified, $token;
   private $values= [];
 
   /**
    * Creates a new in-memory session
    *
    * @param  web.session.Sessions $sessions
+   * @param  int $expire
    * @param  string $token
    * @param  bool $modified
-   * @param  int $eol
    */
-  public function __construct($sessions, $token, $modified, $eol) {
-    parent::__construct($sessions);
+  public function __construct($sessions, $expire, $token, $modified) {
+    parent::__construct($sessions, $expire);
     $this->token= $token;
     $this->modified= $modified;
-    $this->eol= $eol;
   }
 
   /** @return string */
@@ -32,9 +31,6 @@ class Implementation extends Session {
 
   /** @return bool */
   public function modified() { return $this->modified; }
-
-  /** @return bool */
-  public function valid() { return time() < $this->eol; }
 
   /**
    * Returns all session keys
@@ -47,7 +43,7 @@ class Implementation extends Session {
 
   /** @return void */
   public function destroy() {
-    $this->eol= time() - 1;
+    $this->expire= time() - 1;
     $this->values= [];
   }
 
@@ -60,7 +56,7 @@ class Implementation extends Session {
    * @throws web.session.SessionInvalid
    */
   public function register($name, $value) {
-    if (time() >= $this->eol) {
+    if (time() >= $this->expire) {
       throw new SessionInvalid($this->token);
     }
     $this->values[$name]= [$value];
@@ -76,7 +72,7 @@ class Implementation extends Session {
    * @throws web.session.SessionInvalid
    */
   public function value($name, $default= null) {
-    if (time() >= $this->eol) {
+    if (time() >= $this->expire) {
       throw new SessionInvalid($this->token);
     }
     return $this->values[$name][0] ?? $default;
@@ -90,7 +86,7 @@ class Implementation extends Session {
    * @throws web.session.SessionInvalid
    */
   public function remove($name) {
-    if (time() >= $this->eol) {
+    if (time() >= $this->expire) {
       throw new SessionInvalid($this->token);
     }
 
