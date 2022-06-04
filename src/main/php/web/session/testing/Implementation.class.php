@@ -1,33 +1,37 @@
 <?php namespace web\session\testing;
 
-use web\session\{ISession, SessionInvalid};
+use web\session\{Session, SessionInvalid};
 
 /**
- * A testing session
+ * Testing session implementation
  *
- * @see   xp://web.session.ForTesting
+ * @see   web.session.ForTesting
+ * @test  web.session.unittest.ForTestingTest
  */
-class Session implements ISession {
-  private $sessions, $new, $id, $eol;
+class Implementation extends Session {
+  private $modified, $token, $eol;
   private $values= [];
 
   /**
    * Creates a new in-memory session
    *
    * @param  web.session.Sessions $sessions
-   * @param  string $id
-   * @param  bool $new
+   * @param  string $token
+   * @param  bool $modified
    * @param  int $eol
    */
-  public function __construct($sessions, $id, $new, $eol) {
-    $this->sessions= $sessions;
-    $this->id= $id;
-    $this->new= $new;
+  public function __construct($sessions, $token, $modified, $eol) {
+    parent::__construct($sessions);
+    $this->token= $token;
+    $this->modified= $modified;
     $this->eol= $eol;
   }
 
   /** @return string */
-  public function id() { return $this->id; }
+  public function token() { return $this->token; }
+
+  /** @return bool */
+  public function modified() { return $this->modified; }
 
   /** @return bool */
   public function valid() { return time() < $this->eol; }
@@ -44,7 +48,6 @@ class Session implements ISession {
   /** @return void */
   public function destroy() {
     $this->eol= time() - 1;
-    $this->new= false;
     $this->values= [];
   }
 
@@ -58,9 +61,10 @@ class Session implements ISession {
    */
   public function register($name, $value) {
     if (time() >= $this->eol) {
-      throw new SessionInvalid($this->id);
+      throw new SessionInvalid($this->token);
     }
     $this->values[$name]= [$value];
+    $this->modified= true;
   }
 
   /**
@@ -73,7 +77,7 @@ class Session implements ISession {
    */
   public function value($name, $default= null) {
     if (time() >= $this->eol) {
-      throw new SessionInvalid($this->id);
+      throw new SessionInvalid($this->token);
     }
     return $this->values[$name][0] ?? $default;
   }
@@ -87,11 +91,12 @@ class Session implements ISession {
    */
   public function remove($name) {
     if (time() >= $this->eol) {
-      throw new SessionInvalid($this->id);
+      throw new SessionInvalid($this->token);
     }
 
     if (isset($this->values[$name])) {
       unset($this->values[$name]);
+      $this->modified= true;
       return true;
     } else {
       return false;
@@ -104,25 +109,6 @@ class Session implements ISession {
    * @return void
    */
   public function close() {
-    // NOOP
-  }
-
-  /**
-   * Closes and transmits this session to the response
-   *
-   * @param  web.Response $response
-   * @return void
-   */
-  public function transmit($response) {
-    if ($this->new) {
-      $this->sessions->attach($this, $response);
-      $this->new= false;
-      // Fall through, writing session data
-    } else if (time() >= $this->eol) {
-      $this->sessions->detach($this, $response);
-      return;
-    }
-
-    $this->close();
+    $this->modified= false;
   }
 }

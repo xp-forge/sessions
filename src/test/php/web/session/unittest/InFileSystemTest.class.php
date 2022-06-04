@@ -33,9 +33,9 @@ class InFileSystemTest extends SessionsTest {
   }
 
   #[Test]
-  public function session_identifiers_consist_of_32_lowercase_hex_digits() {
+  public function session_tokens_consist_of_32_lowercase_hex_digits() {
     $sessions= $this->fixture();
-    $id= $sessions->create()->id();
-    $this->assertTrue((bool)preg_match('/^[a-f0-9]{32}$/i', $id), $id);
+    $token= $sessions->create()->token();
+    $this->assertTrue((bool)preg_match('/^[a-f0-9]{32}$/i', $token), $token);
   }
 }

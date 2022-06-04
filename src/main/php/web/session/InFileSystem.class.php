@@ -3,15 +3,16 @@
 use io\{File, Folder};
 use lang\{Environment, IllegalArgumentException, IllegalStateException};
 use util\Random;
-use web\session\filesystem\Session;
+use web\session\filesystem\Implementation;
 
 /**
  * Session factory that creates sessions in the local filesystem
  *
- * @test  xp://web.session.unittest.InFileSystemTest
+ * @test  web.session.unittest.InFileSystemTest
  */
 class InFileSystem extends Sessions {
-  private $folder, $prefix, $random;
+  private $folder, $random;
+  public $prefix;
 
   /**
    * Creates a new filesystem-based factory
@@ -63,7 +64,8 @@ class InFileSystem extends Sessions {
       $f= new File($this->folder, $this->prefix.substr($buffer, $offset, 32));
       if (!$f->exists()) {
         $this->gc();
-        return new Session($this, $f, true, time() + $this->duration);
+        $f->touch();
+        return new Implementation($this, $f, [], time() + $this->duration);
       }
     } while ($offset++ < 32);
 
@@ -74,14 +76,14 @@ class InFileSystem extends Sessions {
    * Opens an existing and valid session. 
    *
    * @param  string $id
-   * @return web.session.ISession
+   * @return ?web.session.Session
    */
   public function open($id) {
     $f= new File($this->folder->getURI(), $this->prefix.$id);
     if ($f->exists()) {
       $created= $f->createdAt();
       if (time() - $created < $this->duration) {
-        return new Session($this, $f, false, $created + $this->duration);
+        return new Implementation($this, $f, null, $created + $this->duration);
       }
       $f->unlink();
     }

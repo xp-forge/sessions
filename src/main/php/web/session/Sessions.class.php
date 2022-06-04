@@ -70,7 +70,7 @@ abstract class Sessions {
    * Locates an existing and valid session; returns NULL if there is no such session.
    *
    * @param  web.Request $request
-   * @return ?web.session.ISession
+   * @return ?web.session.Session
    */
   public function locate($request) {
     if ($token= $request->cookie($this->name)) return $this->open($token);
@@ -80,18 +80,18 @@ abstract class Sessions {
   /**
    * Attaches session to response 
    *
-   * @param  web.session.ISession $session
+   * @param  web.session.Session $session
    * @param  web.Response $response
    * @return void
    */
   public function attach($session, $response) {
-    $response->cookie($this->cookies()->create($this->name, $session->id())->maxAge($this->duration));
+    $response->cookie($this->cookies()->create($this->name, $session->token())->maxAge($this->duration));
   }
 
   /**
    * Detaches session from response 
    *
-   * @param  web.session.ISession $session
+   * @param  web.session.Session $session
    * @param  web.Response $response
    * @return void
    */
@@ -102,7 +102,7 @@ abstract class Sessions {
   /**
    * Creates a session
    *
-   * @return web.session.ISession
+   * @return web.session.Session
    */
   public abstract function create();
 
@@ -110,7 +110,7 @@ abstract class Sessions {
    * Opens an existing and valid session. Returns NULL if there is no such session.
    *
    * @param  string $token
-   * @return ?web.session.ISession
+   * @return ?web.session.Session
    */
   public abstract function open($token);
 }

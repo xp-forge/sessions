@@ -2,7 +2,7 @@
 
 use unittest\{Expect, Test, TestCase};
 use web\io\{TestInput, TestOutput};
-use web\session\{Cookies, ISession, SessionInvalid};
+use web\session\{Cookies, Session, SessionInvalid};
 use web\{Request, Response};
 
 abstract class SessionsTest extends TestCase {
@@ -32,7 +32,7 @@ abstract class SessionsTest extends TestCase {
   #[Test]
   public function create() {
     $sessions= $this->fixture();
-    $this->assertInstanceOf(ISession::class, $sessions->create());
+    $this->assertInstanceOf(Session::class, $sessions->create());
   }
 
   #[Test]
@@ -62,7 +62,7 @@ abstract class SessionsTest extends TestCase {
     $session->register('id', 'Test');
     $session->close();
 
-    $session= $sessions->open($session->id());
+    $session= $sessions->open($session->token());
     $this->assertEquals('Test', $session->value('id'));
   }
 
@@ -79,7 +79,7 @@ abstract class SessionsTest extends TestCase {
     $session->register('id', 'Test');
     $session->transmit($this->response());
 
-    $session= $sessions->locate($this->request($sessions->name().'='.$session->id()));
+    $session= $sessions->locate($this->request($sessions->name().'='.$session->token()));
     $this->assertEquals('Test', $session->value('id'));
   }
 
@@ -91,7 +91,7 @@ abstract class SessionsTest extends TestCase {
     $session->destroy();
     $session->transmit($this->response());
 
-    $this->assertNull($sessions->locate($this->request($sessions->name().'='.$session->id())));
+    $this->assertNull($sessions->locate($this->request($sessions->name().'='.$session->token())));
   }
 
   #[Test]
@@ -110,7 +110,7 @@ abstract class SessionsTest extends TestCase {
     $session->transmit($response);
 
     $cookie= $response->cookies()[0];
-    $this->assertEquals([$sessions->name() => $session->id()], [$cookie->name() => $cookie->value()]);
+    $this->assertEquals([$sessions->name() => $session->token()], [$cookie->name() => $cookie->value()]);
   }
 
   #[Test]
@@ -200,7 +200,7 @@ abstract class SessionsTest extends TestCase {
     $session->register('name', 'value');
     $session->transmit($this->response());
 
-    $session= $sessions->open($session->id());
+    $session= $sessions->open($session->token());
     $value= $session->value('name');
 
     $this->assertEquals('value', $value);

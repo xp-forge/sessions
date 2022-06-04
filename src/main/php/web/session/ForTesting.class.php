@@ -1,12 +1,12 @@
 <?php namespace web\session;
 
-use web\session\testing\Session;
+use web\session\testing\Implementation;
 
 /**
  * Session factory used for testing. Keeps session data in a backing map
  * in memory.
  *
- * @test  xp://web.session.unittest.ForTestingTest
+ * @test  web.session.unittest.ForTestingTest
  */
 class ForTesting extends Sessions {
   private $sessions= [];
@@ -18,14 +18,14 @@ class ForTesting extends Sessions {
    */
   public function create() {
     $id= uniqid(microtime(true));
-    return $this->sessions[$id]= new Session($this, $id, true, time() + $this->duration);
+    return $this->sessions[$id]= new Implementation($this, $id, true, time() + $this->duration);
   }
 
   /**
    * Opens an existing and valid session. 
    *
    * @param  string $id
-   * @return web.session.ISession
+   * @return ?web.session.Session
    */
   public function open($id) {
     if (isset($this->sessions[$id])) {
