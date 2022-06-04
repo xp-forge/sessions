@@ -3,6 +3,10 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.0.0 / ????-??-??
+
+* Merged PR #11: Fold transport functionality into sessions - @thekid
+
 ## 2.1.2 / 2021-10-21
 
 * Made compatible with XP 11 - @thekid
