@@ -2,7 +2,8 @@
 
 use web\Cookie;
 
-class Cookies implements Transport {
+/** @see web.sessions.Sessions::cookies() */
+class Cookies {
   private $attributes= [
     'path'     => '/',
     'secure'   => true,
@@ -70,50 +71,19 @@ class Cookies implements Transport {
   }
 
   /**
-   * Locate session attached to request
+   * Creates a cookie with all the attributes set on this instance.
    *
-   * @param  web.session.Sessions $sessions
-   * @param  web.Request $request
-   * @return ?web.session.ISession
+   * @param  string $name
+   * @param  ?string $value pass NULL to delete
+   * @return web.Cookie
    */
-  public function locate($sessions, $request) {
-    if ($id= $request->cookie($sessions->name())) {
-      return $sessions->open($id);
-    }
-    return null;
-  }
-
-  /**
-   * Attach session to response
-   *
-   * @param  web.session.Sessions $sessions
-   * @param  web.Response $response
-   * @param  web.session.ISession $session
-   * @return void
-   */
-  public function attach($sessions, $response, $session) {
-    $response->cookie((new Cookie($sessions->name(), $session->id()))
-      ->maxAge($sessions->duration())
+  public function create($name, $value) {
+    return (new Cookie($name, $value))
       ->path($this->attributes['path'])
       ->secure($this->attributes['secure'])
       ->domain($this->attributes['domain'])
       ->httpOnly($this->attributes['httpOnly'])
       ->sameSite($this->attributes['sameSite'])
-    );
-  }
-
-  /**
-   * Detach session from response
-   *
-   * @param  web.session.Sessions $sessions
-   * @param  web.Response $response
-   * @param  web.session.ISession $session
-   * @return void
-   */
-  public function detach($sessions, $response, $session) {
-    $response->cookie((new Cookie($sessions->name(), null))
-      ->path($this->attributes['path'])
-      ->domain($this->attributes['domain'])
-    );
+    ;
   }
 }

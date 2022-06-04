@@ -5,12 +5,12 @@ use util\TimeSpan;
 /**
  * Base class for session factories
  *
- * @test  xp://web.session.unittest.SessionsTest
+ * @test  web.session.unittest.SessionsTest
  */
 abstract class Sessions {
   protected $duration= 86400;
   protected $name= 'session';
-  protected $transport= null;
+  protected $cookies= null;
 
   /**
    * Sets how long a session should last. Defaults to one day.
@@ -35,13 +35,13 @@ abstract class Sessions {
   }
 
   /**
-   * Sets the session transport
+   * Sets the session cookies
    *
-   * @param  web.session.Transport $transport
+   * @param  web.session.Cookies $cookies
    * @return self
    */
-  public function via($transport) {
-    $this->transport= $transport;
+  public function via($cookies) {
+    $this->cookies= $cookies;
     return $this;
   }
 
@@ -60,11 +60,11 @@ abstract class Sessions {
   public function name() { return $this->name; }
 
   /**
-   * Returns session transport
+   * Returns session cookies
    *
-   * @return web.session.Transport
+   * @return web.session.Cookies
    */
-  public function transport() { return $this->transport ?: $this->transport= new Cookies(); }
+  public function cookies() { return $this->cookies ?? $this->cookies= new Cookies(); }
 
   /**
    * Locates an existing and valid session; returns NULL if there is no such session.
@@ -73,7 +73,8 @@ abstract class Sessions {
    * @return ?web.session.ISession
    */
   public function locate($request) {
-    return $this->transport()->locate($this, $request);
+    if ($token= $request->cookie($this->name)) return $this->open($token);
+    return null;
   }
 
   /**
@@ -84,7 +85,7 @@ abstract class Sessions {
    * @return void
    */
   public function attach($session, $response) {
-    $this->transport()->attach($this, $response, $session);
+    $response->cookie($this->cookies()->create($this->name, $session->id())->maxAge($this->duration));
   }
 
   /**
@@ -95,7 +96,7 @@ abstract class Sessions {
    * @return void
    */
   public function detach($session, $response) {
-    $this->transport()->detach($this, $response, $session);
+    $response->cookie($this->cookies()->create($this->name, null));
   }
 
   /**
@@ -108,8 +109,8 @@ abstract class Sessions {
   /**
    * Opens an existing and valid session. Returns NULL if there is no such session.
    *
-   * @param  string $id
-   * @return web.session.ISession
+   * @param  string $token
+   * @return ?web.session.ISession
    */
-  public abstract function open($id);
+  public abstract function open($token);
 }

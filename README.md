@@ -65,6 +65,8 @@ The [Secure flag](https://www.owasp.org/index.php/SecureFlag) is set for all ses
 
 ```php
 // This will omit the "Secure" flag from session cookies in dev environment
-$dev= 'dev' === $this->environment->profile();
-$sessions= (new InFileSystem('/tmp'))->via((new Cookies())->insecure($dev));
+$sessions= new InFileSystem('/tmp');
+if ('dev' === $this->environment->profile()) {
+  $sessions->cookies()->insecure(true);
+}
 ```
