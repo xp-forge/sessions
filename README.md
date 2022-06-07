@@ -22,7 +22,7 @@ $sessions= (new ForTesting())->lasting(3600)->named('psessionid');
 $session= $sessions->create();
 
 // Open an existing session...
-if ($session= $sessions->open($sessionId)) { … }
+if ($session= $sessions->open($token)) { … }
 
 // ...or locate session attached to a request
 if ($session= $sessions->locate($request)) { … }
