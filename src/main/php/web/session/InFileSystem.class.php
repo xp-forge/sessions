@@ -65,7 +65,7 @@ class InFileSystem extends Sessions {
       if (!$f->exists()) {
         $this->gc();
         $f->touch();
-        return new Implementation($this, time() + $this->duration, $f, []);
+        return new Implementation($this, time() + $this->duration, $f, true);
       }
     } while ($offset++ < 32);
 
@@ -75,15 +75,15 @@ class InFileSystem extends Sessions {
   /**
    * Opens an existing and valid session. 
    *
-   * @param  string $id
+   * @param  string $token
    * @return ?web.session.Session
    */
-  public function open($id) {
-    $f= new File($this->folder->getURI(), $this->prefix.$id);
+  public function open($token) {
+    $f= new File($this->folder, $this->prefix.$token);
     if ($f->exists()) {
       $created= $f->createdAt();
       if (time() - $created < $this->duration) {
-        return new Implementation($this, $created + $this->duration, $f, null);
+        return new Implementation($this, $created + $this->duration, $f, false);
       }
       $f->unlink();
     }

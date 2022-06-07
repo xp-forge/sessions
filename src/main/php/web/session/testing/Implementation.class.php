@@ -9,7 +9,7 @@ use web\session\{Session, SessionInvalid};
  * @test  web.session.unittest.ForTestingTest
  */
 class Implementation extends Session {
-  private $modified, $token;
+  private $attach, $token;
   private $values= [];
 
   /**
@@ -18,19 +18,31 @@ class Implementation extends Session {
    * @param  web.session.Sessions $sessions
    * @param  int $expire
    * @param  string $token
-   * @param  bool $modified
+   * @param  bool $attach
    */
-  public function __construct($sessions, $expire, $token, $modified) {
+  public function __construct($sessions, $expire, $token, $attach) {
     parent::__construct($sessions, $expire);
     $this->token= $token;
-    $this->modified= $modified;
+    $this->attach= $attach;
   }
 
   /** @return string */
   public function token() { return $this->token; }
 
   /** @return bool */
-  public function modified() { return $this->modified; }
+  public function attach() { return $this->attach; }
+
+  /** @return self */
+  public function open() {
+    $this->attach= false;
+    return $this;
+  }
+
+  /** @return void */
+  public function destroy() {
+    $this->values= null;
+    parent::destroy();
+  }
 
   /**
    * Returns all session keys
@@ -39,12 +51,6 @@ class Implementation extends Session {
    */
   public function keys() {
     return array_keys($this->values);
-  }
-
-  /** @return void */
-  public function destroy() {
-    $this->expire= time() - 1;
-    $this->values= [];
   }
 
   /**
@@ -60,7 +66,6 @@ class Implementation extends Session {
       throw new SessionInvalid($this->token);
     }
     $this->values[$name]= [$value];
-    $this->modified= true;
   }
 
   /**
@@ -92,19 +97,9 @@ class Implementation extends Session {
 
     if (isset($this->values[$name])) {
       unset($this->values[$name]);
-      $this->modified= true;
       return true;
     } else {
       return false;
     }
-  }
-
-  /**
-   * Closes this session
-   *
-   * @return void
-   */
-  public function close() {
-    $this->modified= false;
   }
 }

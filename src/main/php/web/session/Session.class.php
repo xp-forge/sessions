@@ -24,25 +24,29 @@ abstract class Session implements Closeable {
   public abstract function token();
 
   /**
-   * Returns whether the session is valid
+   * Returns whether the session is valid. Returns `true` if current time
+   * is past the expire timestamp passed in the constructor in this default
+   * implementation.
    *
    * @return bool
    */
   public function valid() { return time() < $this->expire; }
 
   /**
-   * Returns whether the session has been modified
+   * Returns whether the session needs to be attached. Returns `true` in
+   * this default implementation.
    *
    * @return bool
    */
-  public abstract function modified();
+  public function attach() { return true; }
 
   /**
-   * Destroys the session
+   * Destroys the session. Sets the expire time to one second before the
+   * current time in this default implementation.
    *
    * @return void
    */
-  public abstract function destroy();
+  public function destroy() { $this->expire= time() - 1; }
 
   /**
    * Returns all session keys
@@ -81,15 +85,19 @@ abstract class Session implements Closeable {
   public abstract function remove($name);
 
   /**
-   * Closes this session and flushes data
+   * Closes this session and flushes data. Doesn't do a anything in this
+   * default implementation.
    *
    * @return void
    */
-  public abstract function close();
+  public function close() {
+    // NOOP
+  }
 
   /**
-   * Transmits this session to the response. In case the session hasn't
-   * been modified, do not send a superfluous `Set-Cookie` header.
+   * Transmits this session to the response. In case the session token
+   * hasn't changed, doesn't attach the session to the response in order
+   * to reduce the response header length.
    *
    * @param  web.Response $response
    * @return void
@@ -97,7 +105,7 @@ abstract class Session implements Closeable {
   public final function transmit($response) {
     if (!$this->valid()) {
       $this->sessions->detach($this, $response);
-    } else if ($this->modified()) {
+    } else if ($this->attach()) {
       $this->sessions->attach($this, $response);
       $this->close();
     }

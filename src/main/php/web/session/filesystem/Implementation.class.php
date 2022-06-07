@@ -10,7 +10,7 @@ use web\session\{Session, SessionInvalid};
  * @test  web.session.unittest.InFileSystemTest
  */
 class Implementation extends Session {
-  private $file, $values;
+  private $file, $attach, $values;
   private $modifications= [];
 
   /**
@@ -19,23 +19,34 @@ class Implementation extends Session {
    * @param  web.session.Sessions $sessions
    * @param  int $expire
    * @param  string|io.File $file
-   * @param  ?[:var] $values
+   * @param  bool $new
    */
-  public function __construct($sessions, $expire, $file, $values) {
+  public function __construct($sessions, $expire, $file, $new) {
     parent::__construct($sessions, $expire);
     $this->file= $file instanceof File ? $file : new File($file);
-    $this->values= $values;
+
+    // Only attach sessions to the request during creation.
+    if ($new) {
+      $this->attach= true;
+      $this->values= [];
+    } else {
+      $this->attach= false;
+      $this->values= null;
+    }
   }
 
   /** @return string */
   public function token() { return substr($this->file->getFileName(), strlen($this->sessions->prefix)); }
 
   /** @return bool */
-  public function modified() { return !empty($this->modifications); }
+  public function valid() { return parent::valid() && $this->file->exists(); }
+
+  /** @return bool */
+  public function attach() { return $this->attach; }
 
   /** @return int */
   private function size() {
-    clearstatcache(false, $this->file->getURI());
+    clearstatcache(true, $this->file->getURI());
     return $this->file->size();
   }
 
@@ -73,8 +84,8 @@ class Implementation extends Session {
 
   /** @return void */
   public function destroy() {
-    $this->expire= time() - 1;
     $this->file->unlink();
+    parent::destroy();
   }
 
   /**

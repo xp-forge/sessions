@@ -17,20 +17,20 @@ class ForTesting extends Sessions {
    * @return web.session.Session
    */
   public function create() {
-    $id= uniqid(microtime(true));
-    return $this->sessions[$id]= new Implementation($this, time() + $this->duration, $id, true);
+    $token= uniqid(microtime(true));
+    return $this->sessions[$token]= new Implementation($this, time() + $this->duration, $token, true);
   }
 
   /**
    * Opens an existing and valid session. 
    *
-   * @param  string $id
+   * @param  string $token
    * @return ?web.session.Session
    */
-  public function open($id) {
-    if (isset($this->sessions[$id])) {
-      if ($this->sessions[$id]->valid()) return $this->sessions[$id];
-      unset($this->sessions[$id]);
+  public function open($token) {
+    if (isset($this->sessions[$token])) {
+      if ($this->sessions[$token]->valid()) return $this->sessions[$token]->open();
+      unset($this->sessions[$token]);
     }
     return null;
   }
