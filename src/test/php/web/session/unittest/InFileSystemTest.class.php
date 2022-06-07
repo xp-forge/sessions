@@ -38,4 +38,16 @@ class InFileSystemTest extends SessionsTest {
     $token= $sessions->create()->token();
     $this->assertTrue((bool)preg_match('/^[a-f0-9]{32}$/i', $token), $token);
   }
+
+  #[Test]
+  public function close_does_not_write_after_destroying() {
+    $sessions= $this->fixture();
+
+    $session= $sessions->create();
+    $session->register('test', 'value');
+    $session->destroy();
+    $session->close();
+
+    $this->assertNull($sessions->open($session->token()));
+  }
 }

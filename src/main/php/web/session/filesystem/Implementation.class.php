@@ -85,6 +85,7 @@ class Implementation extends Session {
   /** @return void */
   public function destroy() {
     $this->file->unlink();
+    $this->modifications= [];  // Ensure close() doesn't try to write
     parent::destroy();
   }
 
