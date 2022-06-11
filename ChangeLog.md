@@ -3,7 +3,12 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 3.0.0 / ????-??-??
+## 3.0.0 / 2022-06-11
+
+This major release removes the ability to exchange the session transport
+and hardwires it to use cookies, making session implementations easier.
+Typical usage scenarios haven't included exchanging the transport, and
+in these situations no change to the calling code is required.
 
 * Merged PR #11: Fold transport functionality into sessions - @thekid
 
@@ -22,11 +27,11 @@ Sessions for the XP Framework ChangeLog
 
 ## 2.0.0 / 2020-04-10
 
-* Implemented xp-framework/rfc#334: Drop PHP 5.6:
-  . **Heads up:** Minimum required PHP version now is PHP 7.0.0
-  . Rewrote code base, grouping use statements
-  . Rewrote `isset(X) ? X : default` to `X ?? default`
-  (@thekid)
+This release drops support for PHP 5 as discused in xp-framework/rfc#334.
+The Minimum required PHP version now is PHP 7.0.0!
+
+* Rewrote code base, grouping use statements - @thekid
+* Rewrote `isset(X) ? X : default` to `X ?? default` - @thekid
 
 ## 1.0.2 / 2019-12-01
 
@@ -39,6 +44,8 @@ Sessions for the XP Framework ChangeLog
   (@thekid)
 
 ## 1.0.0 / 2019-08-23
+
+The first major release extracts session transport to its own class.
 
 * **Heads up:** The `Sessions::in($path)` and `Sessions::insecure()`
   methods modifying cookie attributes have been removed and are now in
