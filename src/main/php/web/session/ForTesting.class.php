@@ -11,10 +11,22 @@ use web\session\testing\Session;
 class ForTesting extends Sessions {
   private $sessions= [];
 
+
+  /** @return int */
+  public function gc() {
+    $deleted= 0;
+    foreach ($this->sessions as $id => $session) {
+      if ($session->valid()) continue;
+      unset($this->sessions[$id]);
+      $deleted++;
+    }
+    return $deleted;
+  }
+
   /**
    * Creates a session
    *
-   * @return web.session.Session
+   * @return web.session.ISession
    */
   public function create() {
     $id= uniqid(microtime(true));
@@ -25,7 +37,7 @@ class ForTesting extends Sessions {
    * Opens an existing and valid session. 
    *
    * @param  string $id
-   * @return web.session.ISession
+   * @return ?web.session.ISession
    */
   public function open($id) {
     if (isset($this->sessions[$id])) {
@@ -38,7 +50,7 @@ class ForTesting extends Sessions {
   /**
    * Returns all sessions maintained by this factory
    *
-   * @return web.session.Session[]
+   * @return web.session.ISession[]
    */
   public function all() { return $this->sessions; }
 }

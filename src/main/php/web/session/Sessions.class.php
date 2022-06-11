@@ -67,6 +67,14 @@ abstract class Sessions {
   public function cookies() { return $this->cookies ?? $this->cookies= new Cookies(); }
 
   /**
+   * Performs garbage-collection and returns how many invalid sessions
+   * were deleted.
+   * 
+   * @return int
+   */
+  public function gc() { return 0; }
+
+  /**
    * Locates an existing and valid session; returns NULL if there is no such session.
    *
    * @param  web.Request $request
@@ -113,4 +121,5 @@ abstract class Sessions {
    * @return ?web.session.ISession
    */
   public abstract function open($token);
+
 }

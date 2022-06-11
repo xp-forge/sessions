@@ -19,4 +19,19 @@ class ForTestingTest extends SessionsTest {
     $created= $sessions->create();
     $this->assertEquals([$created->id() => $created], $sessions->all());
   }
+
+  #[Test]
+  public function gc_wipes_destroyed_session() {
+    $sessions= $this->fixture();
+    $created= $sessions->create();
+    $created->destroy();
+    $this->assertEquals([], $sessions->all());
+  }
+
+  #[Test]
+  public function gc_doesnt_wipe_active() {
+    $sessions= $this->fixture();
+    $created= $sessions->create();
+    $this->assertEquals(0, $sessions->gc());
+  }
 }
