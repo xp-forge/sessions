@@ -10,6 +10,7 @@ and hardwires it to use cookies, making session implementations easier.
 Typical usage scenarios haven't included exchanging the transport, and
 in these situations no change to the calling code is required.
 
+* Merged PR #12: Add `gc()` method to `Sessions` base class - @thekid
 * Merged PR #11: Fold transport functionality into sessions - @thekid
 
 ## 2.1.2 / 2021-10-21
