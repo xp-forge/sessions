@@ -45,7 +45,7 @@ class Session implements ISession {
   public function destroy() {
     $this->eol= time() - 1;
     $this->new= false;
-    $this->values= [];
+    $this->sessions->gc();
   }
 
   /**
