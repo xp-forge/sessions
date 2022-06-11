@@ -29,7 +29,7 @@ in these situations no change to the calling code is required.
 ## 2.0.0 / 2020-04-10
 
 This release drops support for PHP 5 as discused in xp-framework/rfc#334.
-The Minimum required PHP version now is PHP 7.0.0!
+The minimum required PHP version now is PHP 7.0.0!
 
 * Rewrote code base, grouping use statements - @thekid
 * Rewrote `isset(X) ? X : default` to `X ?? default` - @thekid
