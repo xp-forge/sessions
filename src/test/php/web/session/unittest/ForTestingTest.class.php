@@ -1,7 +1,7 @@
 <?php namespace web\session\unittest;
 
-use unittest\Assert;
-use unittest\Test;
+use test\Assert;
+use test\Test;
 use web\session\{ForTesting, ISession};
 
 class ForTestingTest extends SessionsTest {
