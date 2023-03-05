@@ -2,6 +2,7 @@
 
 use io\Folder;
 use lang\{Environment, IllegalArgumentException};
+use unittest\Assert;
 use unittest\{AfterClass, BeforeClass, Expect, Test};
 use web\session\InFileSystem;
 
@@ -36,6 +37,6 @@ class InFileSystemTest extends SessionsTest {
   public function session_identifiers_consist_of_32_lowercase_hex_digits() {
     $sessions= $this->fixture();
     $id= $sessions->create()->id();
-    $this->assertTrue((bool)preg_match('/^[a-f0-9]{32}$/i', $id), $id);
+    Assert::true((bool)preg_match('/^[a-f0-9]{32}$/i', $id), $id);
   }
 }

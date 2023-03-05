@@ -1,11 +1,12 @@
 <?php namespace web\session\unittest;
 
+use unittest\Assert;
 use unittest\{Expect, Test, TestCase};
 use web\io\{TestInput, TestOutput};
 use web\session\{Cookies, ISession, SessionInvalid};
 use web\{Request, Response};
 
-abstract class SessionsTest extends TestCase {
+abstract class SessionsTest {
 
   /**
    * Creates a request
@@ -32,26 +33,26 @@ abstract class SessionsTest extends TestCase {
   #[Test]
   public function create() {
     $sessions= $this->fixture();
-    $this->assertInstanceOf(ISession::class, $sessions->create());
+    Assert::instance(ISession::class, $sessions->create());
   }
 
   #[Test]
   public function named() {
     $sessions= $this->fixture();
-    $this->assertEquals('SESS', $sessions->named('SESS')->name());
+    Assert::equals('SESS', $sessions->named('SESS')->name());
   }
 
   #[Test]
   public function lasting() {
     $sessions= $this->fixture();
-    $this->assertEquals(43200, $sessions->lasting(43200)->duration());
+    Assert::equals(43200, $sessions->lasting(43200)->duration());
   }
 
   #[Test]
   public function via() {
     $cookies= (new Cookies())->path('/sub');
     $sessions= $this->fixture();
-    $this->assertEquals($cookies, $sessions->via($cookies)->cookies());
+    Assert::equals($cookies, $sessions->via($cookies)->cookies());
   }
 
   #[Test]
@@ -63,12 +64,12 @@ abstract class SessionsTest extends TestCase {
     $session->close();
 
     $session= $sessions->open($session->id());
-    $this->assertEquals('Test', $session->value('id'));
+    Assert::equals('Test', $session->value('id'));
   }
 
   #[Test]
   public function open_non_existant() {
-    $this->assertNull($this->fixture()->open('@non-existant@'));
+    Assert::null($this->fixture()->open('@non-existant@'));
   }
 
   #[Test]
@@ -80,7 +81,7 @@ abstract class SessionsTest extends TestCase {
     $session->transmit($this->response());
 
     $session= $sessions->locate($this->request($sessions->name().'='.$session->id()));
-    $this->assertEquals('Test', $session->value('id'));
+    Assert::equals('Test', $session->value('id'));
   }
 
   #[Test]
@@ -91,13 +92,13 @@ abstract class SessionsTest extends TestCase {
     $session->destroy();
     $session->transmit($this->response());
 
-    $this->assertNull($sessions->locate($this->request($sessions->name().'='.$session->id())));
+    Assert::null($sessions->locate($this->request($sessions->name().'='.$session->id())));
   }
 
   #[Test]
   public function locate_non_existant() {
     $sessions= $this->fixture();
-    $this->assertNull($sessions->locate($this->request($sessions->name().'=@non-existant@')));
+    Assert::null($sessions->locate($this->request($sessions->name().'=@non-existant@')));
   }
 
   #[Test]
@@ -110,7 +111,7 @@ abstract class SessionsTest extends TestCase {
     $session->transmit($response);
 
     $cookie= $response->cookies()[0];
-    $this->assertEquals([$sessions->name() => $session->id()], [$cookie->name() => $cookie->value()]);
+    Assert::equals([$sessions->name() => $session->id()], [$cookie->name() => $cookie->value()]);
   }
 
   #[Test]
@@ -123,7 +124,7 @@ abstract class SessionsTest extends TestCase {
     $session->transmit($response);
 
     $cookie= $response->cookies()[0];
-    $this->assertEquals([$sessions->name() => ''], [$cookie->name() => $cookie->value()]);
+    Assert::equals([$sessions->name() => ''], [$cookie->name() => $cookie->value()]);
   }
 
   #[Test]
@@ -136,7 +137,7 @@ abstract class SessionsTest extends TestCase {
     $session->transmit($response);
 
     $cookie= $response->cookies()[0];
-    $this->assertEquals('/testing', $cookie->attributes()['path']);
+    Assert::equals('/testing', $cookie->attributes()['path']);
   }
 
   #[Test]
@@ -149,47 +150,47 @@ abstract class SessionsTest extends TestCase {
     $session->transmit($response);
 
     $cookie= $response->cookies()[0];
-    $this->assertEquals('example.org', $cookie->attributes()['domain']);
+    Assert::equals('example.org', $cookie->attributes()['domain']);
   }
 
   #[Test]
   public function valid() {
     $session= $this->fixture()->create();
-    $this->assertTrue($session->valid());
+    Assert::true($session->valid());
   }
 
   #[Test]
   public function read_write() {
     $session= $this->fixture()->create();
     $session->register('name', 'value');
-    $this->assertEquals('value', $session->value('name'));
+    Assert::equals('value', $session->value('name'));
   }
 
   #[Test]
   public function read_non_existant() {
     $session= $this->fixture()->create();
-    $this->assertNull($session->value('name'));
+    Assert::null($session->value('name'));
   }
 
   #[Test]
   public function read_non_existant_returns_default() {
     $session= $this->fixture()->create();
-    $this->assertEquals('Default value', $session->value('name', 'Default value'));
+    Assert::equals('Default value', $session->value('name', 'Default value'));
   }
 
   #[Test]
   public function remove() {
     $session= $this->fixture()->create();
     $session->register('name', 'value');
-    $this->assertTrue($session->remove('name'));
-    $this->assertNull($session->value('name'));
+    Assert::true($session->remove('name'));
+    Assert::null($session->value('name'));
   }
 
   #[Test]
   public function remove_non_existant() {
     $session= $this->fixture()->create();
-    $this->assertFalse($session->remove('name'));
-    $this->assertNull($session->value('name'));
+    Assert::false($session->remove('name'));
+    Assert::null($session->value('name'));
   }
 
   #[Test]
@@ -203,14 +204,14 @@ abstract class SessionsTest extends TestCase {
     $session= $sessions->open($session->id());
     $value= $session->value('name');
 
-    $this->assertEquals('value', $value);
+    Assert::equals('value', $value);
   }
 
   #[Test]
   public function no_longer_valid_after_having_been_destroyed() {
     $session= $this->fixture()->create();
     $session->destroy();
-    $this->assertFalse($session->valid());
+    Assert::false($session->valid());
   }
 
   #[Test, Expect(SessionInvalid::class)]
@@ -237,14 +238,14 @@ abstract class SessionsTest extends TestCase {
   #[Test]
   public function keys_initially_empty() {
     $session= $this->fixture()->create();
-    $this->assertEquals([], $session->keys());
+    Assert::equals([], $session->keys());
   }
 
   #[Test]
   public function key() {
     $session= $this->fixture()->create();
     $session->register('name', 'value');
-    $this->assertEquals(['name'], $session->keys());
+    Assert::equals(['name'], $session->keys());
   }
 
   #[Test]
@@ -252,6 +253,6 @@ abstract class SessionsTest extends TestCase {
     $session= $this->fixture()->create();
     $session->register('name1', 'value1');
     $session->register('name2', 'value2');
-    $this->assertEquals(['name1', 'name2'], $session->keys());
+    Assert::equals(['name1', 'name2'], $session->keys());
   }
 }

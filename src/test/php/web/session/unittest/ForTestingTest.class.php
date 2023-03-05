@@ -1,5 +1,6 @@
 <?php namespace web\session\unittest;
 
+use unittest\Assert;
 use unittest\Test;
 use web\session\{ForTesting, ISession};
 
@@ -10,14 +11,14 @@ class ForTestingTest extends SessionsTest {
 
   #[Test]
   public function all_initially_empty() {
-    $this->assertEquals([], $this->fixture()->all());
+    Assert::equals([], $this->fixture()->all());
   }
 
   #[Test]
   public function all_after_creating_session() {
     $sessions= $this->fixture();
     $created= $sessions->create();
-    $this->assertEquals([$created->id() => $created], $sessions->all());
+    Assert::equals([$created->id() => $created], $sessions->all());
   }
 
   #[Test]
@@ -25,13 +26,13 @@ class ForTestingTest extends SessionsTest {
     $sessions= $this->fixture();
     $created= $sessions->create();
     $created->destroy();
-    $this->assertEquals([], $sessions->all());
+    Assert::equals([], $sessions->all());
   }
 
   #[Test]
   public function gc_doesnt_wipe_active() {
     $sessions= $this->fixture();
     $created= $sessions->create();
-    $this->assertEquals(0, $sessions->gc());
+    Assert::equals(0, $sessions->gc());
   }
 }
