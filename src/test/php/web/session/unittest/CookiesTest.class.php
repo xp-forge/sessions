@@ -1,7 +1,7 @@
 <?php namespace web\session\unittest;
 
-use unittest\Assert;
-use unittest\{Test, TestCase};
+use test\Assert;
+use test\{Test, TestCase};
 use web\session\Cookies;
 
 class CookiesTest {

@@ -1,7 +1,7 @@
 <?php namespace web\session\unittest;
 
-use unittest\Assert;
-use unittest\{Expect, Test, TestCase};
+use test\Assert;
+use test\{Expect, Test, TestCase};
 use web\io\{TestInput, TestOutput};
 use web\session\{Cookies, ISession, SessionInvalid};
 use web\{Request, Response};
