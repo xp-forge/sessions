@@ -3,6 +3,8 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #14: Migrate to new testing library - @thekid
+
 ## 3.0.0 / 2022-06-11
 
 This major release removes the ability to exchange the session transport
