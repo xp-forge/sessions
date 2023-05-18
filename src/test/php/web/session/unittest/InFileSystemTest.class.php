@@ -37,6 +37,6 @@ class InFileSystemTest extends SessionsTest {
   public function session_identifiers_consist_of_32_lowercase_hex_digits() {
     $sessions= $this->fixture();
     $id= $sessions->create()->id();
-    Assert::true((bool)preg_match('/^[a-f0-9]{32}$/i', $id), $id);
+    Assert::matches('/^[a-f0-9]{32}$/i', $id);
   }
 }
