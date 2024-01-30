@@ -3,6 +3,9 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.1.0 / 2024-01-30
+
+* Made this library compatible with xp-forge/web version 4.0 - @thekid
 * Merged PR #14: Migrate to new testing library - @thekid
 
 ## 3.0.0 / 2022-06-11
