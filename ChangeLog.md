@@ -5,6 +5,7 @@ Sessions for the XP Framework ChangeLog
 
 ## 3.1.0 / 2024-01-30
 
+* Added PHP 8.4 to the test matrix - @thekid
 * Made this library compatible with xp-forge/web version 4.0 - @thekid
 * Merged PR #14: Migrate to new testing library - @thekid
 
