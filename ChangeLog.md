@@ -3,6 +3,10 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.2.0 / 2024-03-24
+
+* Made compatible with XP 12 - @thekid
+
 ## 3.1.0 / 2024-01-30
 
 * Added PHP 8.4 to the test matrix - @thekid
