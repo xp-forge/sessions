@@ -39,4 +39,24 @@ class InFileSystemTest extends SessionsTest {
     $id= $sessions->create()->id();
     Assert::matches('/^[a-f0-9]{32}$/i', $id);
   }
+
+  #[Test]
+  public function issue_15_extra_data_during_unserialize() {
+    $sessions= $this->fixture();
+
+    // Create session and register value
+    $a= $sessions->create();
+    $a->register('name', 'initial');
+    $a->close();
+
+    // Overwrite initial value with a shorter one, this should truncate
+    $b= $sessions->open($a->id());
+    $b->register('name', 'test');
+    $b->close();
+
+    // Modify session again, should not trigger the "extra data" warning
+    $c= $sessions->open($a->id());
+    $c->register('name', 'irrelevant');
+    $c->close();
+  }
 }

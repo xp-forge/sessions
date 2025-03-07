@@ -3,6 +3,9 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed issue #15: unserialize(): Extra data starting at offset [...]
+  (@thekid)
+
 ## 3.2.0 / 2024-03-24
 
 * Made compatible with XP 12 - @thekid

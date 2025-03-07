@@ -162,7 +162,12 @@ class Session implements ISession {
       $modification($name);
     }
     $this->modifications= [];
-    $this->file->write(serialize($this->values));
+
+    // Write file, ensuring to truncate any extra data
+    $length= $this->file->write(serialize($this->values));
+    if ($length < $size) {
+      $this->file->truncate($length);
+    }
 
     $this->file->unLock();
     $this->file->close();
