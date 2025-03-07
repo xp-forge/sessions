@@ -3,6 +3,8 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.2.1 / 2025-03-07
+
 * Fixed issue #15: unserialize(): Extra data starting at offset [...]
   (@thekid)
 
