@@ -3,6 +3,10 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* **Heads up:** Dropped support for PHP < 7.4, see xp-framework/rfc#343
+  (@thekid)
+* Added PHP 8.5 to test matrix - @thekid
+
 ## 3.2.1 / 2025-03-07
 
 * Fixed issue #15: unserialize(): Extra data starting at offset [...]
