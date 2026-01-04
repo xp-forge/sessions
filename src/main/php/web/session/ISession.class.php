@@ -2,6 +2,7 @@
 
 use lang\Closeable;
 
+/** @deprecated Extend the Persistence class instead */
 interface ISession extends Closeable {
 
   /**
