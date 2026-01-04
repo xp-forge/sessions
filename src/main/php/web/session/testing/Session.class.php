@@ -92,13 +92,4 @@ class Session extends Persistence {
       return false;
     }
   }
-
-  /**
-   * Closes this session
-   *
-   * @return void
-   */
-  public function close() {
-    // NOOP
-  }
 }

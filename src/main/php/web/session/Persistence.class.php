@@ -41,4 +41,12 @@ abstract class Persistence implements ISession {
 
     $this->close();
   }
+
+  /**
+   * Closes this session. Does nothing in this default implementation,
+   * override in subclasses.
+   *
+   * @return void
+   */
+  public function close() { }
 }
