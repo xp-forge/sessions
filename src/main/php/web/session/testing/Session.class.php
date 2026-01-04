@@ -1,14 +1,14 @@
 <?php namespace web\session\testing;
 
-use web\session\{ISession, SessionInvalid};
+use web\session\{Persistence, SessionInvalid};
 
 /**
  * A testing session
  *
- * @see   xp://web.session.ForTesting
+ * @see   web.session.ForTesting
  */
-class Session implements ISession {
-  private $sessions, $new, $id, $eol;
+class Session extends Persistence {
+  private $id;
   private $values= [];
 
   /**
@@ -16,21 +16,16 @@ class Session implements ISession {
    *
    * @param  web.session.Sessions $sessions
    * @param  string $id
-   * @param  bool $new
-   * @param  int $eol
+   * @param  bool $detached
+   * @param  int $expires
    */
-  public function __construct($sessions, $id, $new, $eol) {
-    $this->sessions= $sessions;
+  public function __construct($sessions, $id, $detached, $expires) {
+    parent::__construct($sessions, $detached, $expires);
     $this->id= $id;
-    $this->new= $new;
-    $this->eol= $eol;
   }
 
   /** @return string */
   public function id() { return $this->id; }
-
-  /** @return bool */
-  public function valid() { return time() < $this->eol; }
 
   /**
    * Returns all session keys
@@ -43,8 +38,8 @@ class Session implements ISession {
 
   /** @return void */
   public function destroy() {
-    $this->eol= time() - 1;
-    $this->new= false;
+    $this->expires= time() - 1;
+    $this->detached= false;
     $this->sessions->gc();
   }
 
@@ -57,7 +52,7 @@ class Session implements ISession {
    * @throws web.session.SessionInvalid
    */
   public function register($name, $value) {
-    if (time() >= $this->eol) {
+    if (time() >= $this->expires) {
       throw new SessionInvalid($this->id);
     }
     $this->values[$name]= [$value];
@@ -72,7 +67,7 @@ class Session implements ISession {
    * @throws web.session.SessionInvalid
    */
   public function value($name, $default= null) {
-    if (time() >= $this->eol) {
+    if (time() >= $this->expires) {
       throw new SessionInvalid($this->id);
     }
     return $this->values[$name][0] ?? $default;
@@ -86,7 +81,7 @@ class Session implements ISession {
    * @throws web.session.SessionInvalid
    */
   public function remove($name) {
-    if (time() >= $this->eol) {
+    if (time() >= $this->expires) {
       throw new SessionInvalid($this->id);
     }
 
@@ -96,33 +91,5 @@ class Session implements ISession {
     } else {
       return false;
     }
-  }
-
-  /**
-   * Closes this session
-   *
-   * @return void
-   */
-  public function close() {
-    // NOOP
-  }
-
-  /**
-   * Closes and transmits this session to the response
-   *
-   * @param  web.Response $response
-   * @return void
-   */
-  public function transmit($response) {
-    if ($this->new) {
-      $this->sessions->attach($this, $response);
-      $this->new= false;
-      // Fall through, writing session data
-    } else if (time() >= $this->eol) {
-      $this->sessions->detach($this, $response);
-      return;
-    }
-
-    $this->close();
   }
 }

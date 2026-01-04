@@ -62,13 +62,6 @@ interface ISession extends Closeable {
   public function remove($name);
 
   /**
-   * Closes this session
-   *
-   * @return void
-   */
-  public function close();
-
-  /**
    * Closes and transmits this session to the response
    *
    * @param  web.Response $response
