@@ -33,7 +33,7 @@ class Session implements ISession {
   public function valid() { return time() < $this->eol; }
 
   /** @return int */
-  public function remaining($time= null) { return $this->eol - ($time ?? time()); }
+  public function expires() { return $this->eol; }
 
   /**
    * Returns all session keys

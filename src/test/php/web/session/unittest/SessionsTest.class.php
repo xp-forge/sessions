@@ -48,9 +48,9 @@ abstract class SessionsTest {
   }
 
   #[Test, Values([3600, 43200])]
-  public function remaining_time($duration) {
+  public function expires($duration) {
     $sessions= $this->fixture()->lasting($duration);
-    Assert::equals($sessions->duration(), $sessions->create()->remaining());
+    Assert::equals(time() + $sessions->duration(), $sessions->create()->expires());
   }
 
   #[Test]
@@ -220,10 +220,10 @@ abstract class SessionsTest {
   }
 
   #[Test]
-  public function no_remaing_time_after_having_been_destroyed() {
+  public function expiry_past_after_having_been_destroyed() {
     $session= $this->fixture()->create();
     $session->destroy();
-    Assert::true($session->remaining() < 0);
+    Assert::true($session->expires() < time());
   }
 
   #[Test, Expect(SessionInvalid::class)]
