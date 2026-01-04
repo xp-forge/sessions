@@ -1,15 +1,15 @@
 <?php namespace web\session\filesystem;
 
 use io\File;
-use web\session\{ISession, SessionInvalid};
+use web\session\{Persistence, SessionInvalid};
 
 /**
  * A session stored in the filesystem
  *
  * @see   web.session.InFileSystem
  */
-class Session implements ISession {
-  private $sessions, $new, $file, $eol;
+class Session extends Persistence {
+  private $file;
   private $values= null;
   private $modifications= [];
 
@@ -18,16 +18,14 @@ class Session implements ISession {
    *
    * @param  web.session.Sessions $sessions
    * @param  string|io.File $file
-   * @param  bool $new
-   * @param  int $eol
+   * @param  bool $detached
+   * @param  int $expires
    */
-  public function __construct($sessions, $file, $new, $eol) {
-    $this->sessions= $sessions;
+  public function __construct($sessions, $file, $detached, $expires) {
+    parent::__construct($sessions, $detached, $expires);
     $this->file= $file instanceof File ? $file : new File($file);
-    $this->new= $new;
-    $this->eol= $eol;
 
-    if ($new) {
+    if ($detached) {
       $file->touch();
       $this->values= [];
     }
@@ -35,12 +33,6 @@ class Session implements ISession {
 
   /** @return string */
   public function id() { return str_replace('sess_', '', $this->file->getFileName()); }
-
-  /** @return bool */
-  public function valid() { return time() < $this->eol; }
-
-  /** @return int */
-  public function expires() { return $this->eol; }
 
   /** @return int */
   private function size() {
@@ -55,7 +47,7 @@ class Session implements ISession {
    * @throws web.session.SessionInvalid
    */
   private function open() {
-    if (time() >= $this->eol) {
+    if (time() >= $this->expires) {
       throw new SessionInvalid($this->id());
     } else if (null !== $this->values) {
       return;
@@ -82,8 +74,8 @@ class Session implements ISession {
 
   /** @return void */
   public function destroy() {
-    $this->eol= time() - 1;
-    $this->new= false;
+    $this->expires= time() - 1;
+    $this->detached= false;
     $this->file->unlink();
   }
 
@@ -174,24 +166,5 @@ class Session implements ISession {
 
     $this->file->unLock();
     $this->file->close();
-  }
-
-  /**
-   * Transmits this session to the response
-   *
-   * @param  web.Response $response
-   * @return void
-   */
-  public function transmit($response) {
-    if ($this->new) {
-      $this->sessions->attach($this, $response);
-      $this->new= false;
-      // Fall through, writing session data
-    } else if (time() >= $this->eol) {
-      $this->sessions->detach($this, $response);
-      return;
-    }
-
-    $this->close();
   }
 }
