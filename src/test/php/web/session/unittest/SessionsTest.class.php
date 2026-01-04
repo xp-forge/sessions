@@ -1,7 +1,6 @@
 <?php namespace web\session\unittest;
 
-use test\Assert;
-use test\{Expect, Test, TestCase};
+use test\{Assert, Expect, Test, Values};
 use web\io\{TestInput, TestOutput};
 use web\session\{Cookies, ISession, SessionInvalid};
 use web\{Request, Response};
@@ -42,10 +41,16 @@ abstract class SessionsTest {
     Assert::equals('SESS', $sessions->named('SESS')->name());
   }
 
-  #[Test]
-  public function lasting() {
-    $sessions= $this->fixture();
-    Assert::equals(43200, $sessions->lasting(43200)->duration());
+  #[Test, Values([3600, 43200])]
+  public function lasting($duration) {
+    $sessions= $this->fixture()->lasting($duration);
+    Assert::equals($duration, $sessions->duration());
+  }
+
+  #[Test, Values([3600, 43200])]
+  public function remaining_time($duration) {
+    $sessions= $this->fixture()->lasting($duration);
+    Assert::equals($sessions->duration(), $sessions->create()->remaining());
   }
 
   #[Test]
@@ -212,6 +217,13 @@ abstract class SessionsTest {
     $session= $this->fixture()->create();
     $session->destroy();
     Assert::false($session->valid());
+  }
+
+  #[Test]
+  public function no_remaing_time_after_having_been_destroyed() {
+    $session= $this->fixture()->create();
+    $session->destroy();
+    Assert::true($session->remaining() < 0);
   }
 
   #[Test, Expect(SessionInvalid::class)]

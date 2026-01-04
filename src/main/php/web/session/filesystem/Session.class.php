@@ -6,7 +6,7 @@ use web\session\{ISession, SessionInvalid};
 /**
  * A session stored in the filesystem
  *
- * @see   xp://web.session.InFileSystem
+ * @see   web.session.InFileSystem
  */
 class Session implements ISession {
   private $sessions, $new, $file, $eol;
@@ -19,7 +19,7 @@ class Session implements ISession {
    * @param  web.session.Sessions $sessions
    * @param  string|io.File $file
    * @param  bool $new
-   * @param  int eol
+   * @param  int $eol
    */
   public function __construct($sessions, $file, $new, $eol) {
     $this->sessions= $sessions;
@@ -38,6 +38,9 @@ class Session implements ISession {
 
   /** @return bool */
   public function valid() { return time() < $this->eol; }
+
+  /** @return int */
+  public function remaining($time= null) { return $this->eol - ($time ?? time()); }
 
   /** @return int */
   private function size() {

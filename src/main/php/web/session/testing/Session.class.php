@@ -5,7 +5,7 @@ use web\session\{ISession, SessionInvalid};
 /**
  * A testing session
  *
- * @see   xp://web.session.ForTesting
+ * @see   web.session.ForTesting
  */
 class Session implements ISession {
   private $sessions, $new, $id, $eol;
@@ -31,6 +31,9 @@ class Session implements ISession {
 
   /** @return bool */
   public function valid() { return time() < $this->eol; }
+
+  /** @return int */
+  public function remaining($time= null) { return $this->eol - ($time ?? time()); }
 
   /**
    * Returns all session keys
