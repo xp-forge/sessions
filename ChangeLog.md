@@ -3,13 +3,14 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
-* Added PHP 8.6 to the test matrix - @thekid
-
 ## 4.0.0 / ????-??-??
 
+* Merged PR #16: Add `web.session.Persistence` base class superseding the
+  ISession interface, which becomes deprecated.
+  (@thekid)
 * **Heads up:** Dropped support for PHP < 7.4, see xp-framework/rfc#343
   (@thekid)
-* Added PHP 8.5 to test matrix - @thekid
+* Added PHP 8.5 and 8.6 to test matrix - @thekid
 
 ## 3.2.1 / 2025-03-07
 
