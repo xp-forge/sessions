@@ -53,7 +53,7 @@ class InFileSystem extends Sessions {
   /**
    * Creates a session
    *
-   * @return web.session.ISession
+   * @return web.session.Persistence
    */
   public function create() {
     $buffer= bin2hex($this->random->bytes(32));   // 64 bytes
@@ -74,7 +74,7 @@ class InFileSystem extends Sessions {
    * Opens an existing and valid session. 
    *
    * @param  string $id
-   * @return ?web.session.ISession
+   * @return ?web.session.Persistence
    */
   public function open($id) {
     $f= new File($this->folder->getURI(), $this->prefix.$id);

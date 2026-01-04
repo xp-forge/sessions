@@ -26,7 +26,7 @@ class ForTesting extends Sessions {
   /**
    * Creates a session
    *
-   * @return web.session.ISession
+   * @return web.session.Persistence
    */
   public function create() {
     $id= uniqid(microtime(true));
@@ -37,7 +37,7 @@ class ForTesting extends Sessions {
    * Opens an existing and valid session. 
    *
    * @param  string $id
-   * @return ?web.session.ISession
+   * @return ?web.session.Persistence
    */
   public function open($id) {
     if (isset($this->sessions[$id])) {
@@ -50,7 +50,7 @@ class ForTesting extends Sessions {
   /**
    * Returns all sessions maintained by this factory
    *
-   * @return web.session.ISession[]
+   * @return web.session.Persistence[]
    */
   public function all() { return $this->sessions; }
 }
