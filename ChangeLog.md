@@ -3,7 +3,7 @@ Sessions for the XP Framework ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 4.0.0 / ????-??-??
+## 4.0.0 / 2026-01-04
 
 * Merged PR #16: Add `web.session.Persistence` base class superseding the
   ISession interface, which becomes deprecated.
